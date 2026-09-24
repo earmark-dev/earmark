@@ -27,7 +27,7 @@ sources.yml  --commit-->  Action runs `earmark publish`  --commit-->  Pages serv
 ## Setting it up
 
 1. Create a repo from the template
-   [**jhelvy/earmark-library**](https://github.com/jhelvy/earmark-library)
+   [**earmark-dev/library-template**](https://github.com/earmark-dev/library-template)
    with **Use this template**. Make it **public**; see the limits below.
 2. In the new repo, open **Settings → Pages**. Set *Source* to **Deploy from a
    branch**, branch `main`, folder `/ (root)`, then Save. This is the one step
@@ -82,7 +82,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: jhelvy/earmark@v1
+      - uses: earmark-dev/earmark@v1
         # with:
         #   base-url: https://audio.example.com   # a custom domain
         #   title: My Reading Pile

@@ -48,7 +48,7 @@ terminal afterwards so the new `PATH` is picked up.
 The rest is the same everywhere:
 
 ```bash
-git clone https://github.com/jhelvy/earmark.git
+git clone https://github.com/earmark-dev/earmark.git
 cd earmark
 uv tool install --python 3.12 -e .
 ```

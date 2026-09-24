@@ -27,4 +27,4 @@ jobs:
     timeout-minutes: 300
     steps:
       - uses: actions/checkout@v6
-      - uses: jhelvy/earmark@v1
+      - uses: earmark-dev/earmark@v1

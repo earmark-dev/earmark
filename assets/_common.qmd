@@ -11,11 +11,11 @@ Everything runs on your machine. No API keys, no per-minute cost.
 You need [uv](https://docs.astral.sh/uv/), `ffmpeg`, and Python 3.11 or 3.12
 (`uv` will fetch it for you). 
 
-Go to the [Installation](https://jhelvy.github.io/earmark/user-guide/installation.html) page for details.
+Go to the [Installation](https://earmark-dev.github.io/earmark/user-guide/installation.html) page for details.
 
 ## Main commands
 
-Everything earmark makes lands in one folder you choose (your [library](https://jhelvy.github.io/earmark/user-guide/the-library.html)),
+Everything earmark makes lands in one folder you choose (your [library](https://earmark-dev.github.io/earmark/user-guide/the-library.html)),
 which should be a folder served on the public web. 
 
 There are 3 main commands: 
@@ -37,16 +37,16 @@ The other four commands are setup and housekeeping: `init`,
 
 | | |
 |---|---|
-| [Installation](https://jhelvy.github.io/earmark/user-guide/installation.html) | uv, ffmpeg, and the Python version that matters |
-| [Quickstart](https://jhelvy.github.io/earmark/user-guide/quickstart.html) | empty folder to something playing on your phone |
-| [The library](https://jhelvy.github.io/earmark/user-guide/the-library.html) | why a library is a folder |
-| [The pipeline](https://jhelvy.github.io/earmark/user-guide/the-pipeline.html) | `text`, `audio`, `publish`, and editing in between |
-| [Text cleaning](https://jhelvy.github.io/earmark/user-guide/text-cleaning.html) | what gets rewritten before anything is spoken |
-| [Choosing a voice](https://jhelvy.github.io/earmark/user-guide/voices.html) | 54 voices and how to pick one |
-| [Publishing anywhere](https://jhelvy.github.io/earmark/user-guide/publishing.html) | GitHub Pages, rclone, rsync: one line each |
-| [Subscribing on your phone](https://jhelvy.github.io/earmark/user-guide/subscribing.html) | where the feed URL goes in each app |
-| [Running on GitHub](https://jhelvy.github.io/earmark/user-guide/github.html) | a repo that narrates and publishes itself, nothing installed |
-| [Reference](https://jhelvy.github.io/earmark/reference/) | every command, flag and config key |
+| [Installation](https://earmark-dev.github.io/earmark/user-guide/installation.html) | uv, ffmpeg, and the Python version that matters |
+| [Quickstart](https://earmark-dev.github.io/earmark/user-guide/quickstart.html) | empty folder to something playing on your phone |
+| [The library](https://earmark-dev.github.io/earmark/user-guide/the-library.html) | why a library is a folder |
+| [The pipeline](https://earmark-dev.github.io/earmark/user-guide/the-pipeline.html) | `text`, `audio`, `publish`, and editing in between |
+| [Text cleaning](https://earmark-dev.github.io/earmark/user-guide/text-cleaning.html) | what gets rewritten before anything is spoken |
+| [Choosing a voice](https://earmark-dev.github.io/earmark/user-guide/voices.html) | 54 voices and how to pick one |
+| [Publishing anywhere](https://earmark-dev.github.io/earmark/user-guide/publishing.html) | GitHub Pages, rclone, rsync: one line each |
+| [Subscribing on your phone](https://earmark-dev.github.io/earmark/user-guide/subscribing.html) | where the feed URL goes in each app |
+| [Running on GitHub](https://earmark-dev.github.io/earmark/user-guide/github.html) | a repo that narrates and publishes itself, nothing installed |
+| [Reference](https://earmark-dev.github.io/earmark/reference/) | every command, flag and config key |
 
 ## Development
 

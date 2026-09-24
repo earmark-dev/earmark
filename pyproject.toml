@@ -32,9 +32,9 @@ misaki = ["misaki[en]>=0.9.4"]
 dev = ["pytest>=8", "pytest-cov"]
 
 [project.urls]
-Homepage = "https://github.com/jhelvy/earmark"
-Documentation = "https://jhelvy.github.io/earmark"
-Issues = "https://github.com/jhelvy/earmark/issues"
+Homepage = "https://github.com/earmark-dev/earmark"
+Documentation = "https://earmark-dev.github.io/earmark"
+Issues = "https://github.com/earmark-dev/earmark/issues"
 
 [project.scripts]
 earmark = "earmark.cli:main"

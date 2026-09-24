@@ -11,6 +11,6 @@ format: gfm
 
 Turn articles into narrated audio, then publish to a public podcast feed
 
-**[Documentation →](https://jhelvy.github.io/earmark/)**
+**[Documentation →](https://earmark-dev.github.io/earmark/)**
 
 {{< include assets/_common.qmd >}}

@@ -1,7 +1,7 @@
 # My earmark library
 
 A private podcast of things I meant to read, narrated by
-[earmark](https://jhelvy.github.io/earmark) and served by GitHub Pages.
+[earmark](https://earmark-dev.github.io/earmark) and served by GitHub Pages.
 
 ## Setup (once)
 

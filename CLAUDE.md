@@ -169,12 +169,12 @@ root holds a README, `.nojekyll`, `.gitignore` and `sources.yml`, and
 
 ### The GitHub Action
 
-`action.yml` at the repo root is a composite Action (`uses: jhelvy/earmark@v1`)
+`action.yml` at the repo root is a composite Action (`uses: earmark-dev/earmark@v1`)
 that installs earmark from its own checkout (`github.action_path`), so the tag
 a workflow names is the earmark version it runs. It caches the model, runs
 `earmark init` on the first run with a `base_url` derived from the repo name,
 runs `earmark publish`, refuses files over GitHub's 100 MB limit, and commits
-back. `template/` is the content of the `jhelvy/earmark-library` template repo.
+back. `template/` is the content of the `earmark-dev/library-template` template repo.
 
 ### Episode filenames follow the slug
 
@@ -229,7 +229,7 @@ untouched for 90 days, then LRU eviction above 2 GB.
 ## The docs are a site, not the README
 
 `README.md` is a landing page and nothing else. Everything a user reads lives
-at <https://jhelvy.github.io/earmark>, built with **great-docs**, which is a
+at <https://earmark-dev.github.io/earmark>, built with **great-docs**, which is a
 Python package that *generates* a Quarto project into the gitignored
 `great-docs/` directory on every build. There is no `_quarto.yml` to edit and
 committing one would be pointless — it is synthesized each time.
@@ -274,7 +274,7 @@ rebuild moves them.
   asking great-docs for a declared `includes:` list.
 
   The shared body links to the *deployed* site
-  (`https://jhelvy.github.io/earmark/user-guide/quickstart.html`) instead of
+  (`https://earmark-dev.github.io/earmark/user-guide/quickstart.html`) instead of
   `user-guide/quickstart.qmd`: the same table has to work from GitHub's README
   view, where a relative `.qmd` path is a 404. The cost is that local preview
   navigation off the landing page goes to the live site.

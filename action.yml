@@ -6,7 +6,7 @@
 # other public folder.
 #
 #   - uses: actions/checkout@v6
-#   - uses: jhelvy/earmark@v1
+#   - uses: earmark-dev/earmark@v1
 #
 # Installs earmark from this Action's own checkout, so the version used is the
 # tag the workflow names. A push made with GITHUB_TOKEN never triggers another
