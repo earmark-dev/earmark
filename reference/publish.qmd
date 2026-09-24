@@ -4,7 +4,7 @@ description: "Step 3, plus 1 and 2 if needed: anything goes on your feed."
 ---
 
 ```
-earmark publish SOURCE [voice options] [audio options] [behaviour options]
+earmark publish [SOURCE] [voice options] [audio options] [behaviour options]
                 [metadata options] [cleaning options]
 ```
 
@@ -20,11 +20,40 @@ other two commands are optional.
 
 | Argument | Means |
 |---|---|
-| `SOURCE` | a file path, a Markdown file, an MP3, or a URL |
+| `SOURCE` | a file path, a Markdown file, an MP3, or a URL. Omit it to sync `sources.yml`. |
 
 An existing `.mp3`, `.m4a` or `.wav` is **adopted** onto the feed with no
 synthesis at all, which is how a recording made elsewhere ends up in the same
 feed as the things earmark narrated.
+
+## With no SOURCE: make the feed match `sources.yml`
+
+`earmark publish` on its own reads the library's
+[`sources.yml`](configuration.qmd#sources.yml) and makes the feed agree with it:
+
+- An entry with no episode yet is published, exactly as if it had been named
+  on the command line, with the entry's own `title`, `voice` and so on
+  overriding the config.
+- An episode whose entry has been **deleted from the list is removed**, with
+  its MP3 and its `text/` Markdown, the same as
+  [`earmark feed --remove`](feed.qmd).
+- An episode you published by hand, with a SOURCE, is never touched. Only
+  episodes that came from the list can leave because of it.
+
+An entry is matched by its `source` string exactly as written. Changing an
+entry's `voice` therefore does not re-narrate it; delete the entry, sync, and
+add it back.
+
+One entry failing, such as a dead link, does not stop the others. It is
+reported, the rest are published, and the command exits 1. A list that does not
+parse, or that names a file that is not there, stops the sync before anything
+is removed.
+
+`--dry-run` prints what would be added and removed and changes nothing. The
+other flags apply to every new entry, below anything the entry sets itself.
+
+This is how a library in a GitHub repo publishes itself. See
+[Running on GitHub](../user-guide/github.qmd).
 
 ## Options
 
@@ -61,4 +90,6 @@ earmark publish https://example.com/some-long-article
 earmark publish text/some-paper.md          # after editing the Markdown
 earmark publish interview.mp3               # adopt existing audio
 earmark publish paper.pdf --profile paper --voice af_bella
+earmark publish                             # sync sources.yml
+earmark publish --dry-run                   # what a sync would do
 ```

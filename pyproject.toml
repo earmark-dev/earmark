@@ -21,6 +21,7 @@ dependencies = [
   "trafilatura>=2.2.0",
   "markitdown[pdf,docx,pptx]>=0.1.7",
   "pypdf>=6.0",
+  "pyyaml>=6.0",
   "mutagen>=1.47",
   "platformdirs>=4.0",
   "rich>=13",

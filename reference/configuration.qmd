@@ -166,6 +166,37 @@ title = "earmark"
 # image = "https://..."   # or artwork already hosted somewhere; this wins
 ```
 
+## `sources.yml`
+
+The library's reading list, written by `earmark init` beside `earmark.toml` and
+read by [`earmark publish`](publish.qmd) when it is given no SOURCE. It is a
+YAML list. Each entry is one of:
+
+```yaml
+- https://example.com/some-article        # a URL
+- files/a-paper.pdf                       # a file, relative to the library
+- source: https://example.com/long-read   # a mapping, for overrides
+  title: A better title
+  voice: bf_emma
+  profile: paper
+```
+
+A mapping takes `source` plus any of `title`, `author`, `date`, `voice`,
+`speed`, `lang` and `profile`, which mean what the flags of the same name mean.
+An entry's settings beat the config; the config beats the defaults.
+
+| Problem | Treated as |
+|---|---|
+| an unknown key in an entry | a warning; the key is ignored |
+| the same `source` twice | an error |
+| a file entry that does not exist | an error |
+| an entry with no `source` | an error |
+| the file is not valid YAML, or is not a list | an error |
+
+Any error stops the sync before it changes anything, because syncing to a list
+read only in part would remove the episodes of the entries it could not read. A
+file of nothing but comments is an empty list, not an error.
+
 ## What is *not* in the library
 
 Three things are deliberately stored outside it, because they must not sync to a

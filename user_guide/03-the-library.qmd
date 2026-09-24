@@ -8,6 +8,7 @@ Everything earmark makes lives in one folder you choose, your **library**.
 ```
 ~/pCloud Drive/public/earmark/   <- the library
   earmark.toml                   its settings
+  sources.yml                    an optional reading list
   feed.xml   episodes.json       the feed
   cover.jpg
   text/

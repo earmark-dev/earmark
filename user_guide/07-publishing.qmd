@@ -54,6 +54,10 @@ base_url = "https://pub-xxxx.r2.dev"
 
 Set `base_url` to wherever those files end up, not to where they start.
 
+For GitHub Pages there is also a way that needs no computer at all: keep the
+whole library in the repo and let an Action do the narrating. See [Running on
+GitHub](11-github.qmd).
+
 ## Why there is no `--publisher` flag
 
 There used to be four publishers built in: folder, rclone, command, and github.

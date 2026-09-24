@@ -34,6 +34,9 @@ publish runs the whole chain, so `earmark publish paper.pdf` is all you need.
 The other two exist for when you want to stop partway -- to fix a mangled
 equation in the Markdown, or to narrate something without publishing it.
 
+With no SOURCE, `earmark publish` makes the feed match the list in
+sources.yml: new entries are published, deleted ones are removed.
+
 setting up:
   earmark init ~/pCloud\\ Drive/public/earmark \\
       --base-url https://filedn.com/XXXX/earmark
@@ -160,7 +163,9 @@ def build_parser() -> argparse.ArgumentParser:
     _add_clean_args(audio)
 
     pub = _sub(sub, "publish", help="step 3 -- plus 1 and 2 if needed: anything -> your feed")
-    pub.add_argument("source", metavar="SOURCE", help="a file path, a Markdown file, an MP3, or a URL")
+    pub.add_argument("source", metavar="SOURCE", nargs="?", default=None,
+                     help="a file path, a Markdown file, an MP3, or a URL; "
+                          "omit it to make the feed match sources.yml")
     _add_voice_args(pub)
     _add_audio_args(pub)
     _add_meta_args(pub)
@@ -299,6 +304,7 @@ def _is_audio(source: str) -> bool:
 
 def cmd_init(args) -> int:
     from earmark import config as config_mod
+    from earmark import sources as sources_mod
     from earmark.library import Library, write_default
 
     root = Path(args.path).expanduser() if args.path else Path.cwd()
@@ -310,6 +316,10 @@ def cmd_init(args) -> int:
     if not written:
         print(f"{path} already exists; --force to overwrite", file=sys.stderr)
         return 1
+
+    listed = lib.root / sources_mod.FILENAME
+    if not listed.exists():
+        listed.write_text(sources_mod.TEMPLATE, encoding="utf-8")
 
     print(f"library: {lib.root}")
     print(f"  {config_mod.TEMPLATE.splitlines()[0].lstrip('# ')}: {path}")
@@ -520,6 +530,9 @@ def cmd_publish(args) -> int:
     lib, cfg = _open_library(args)
     cfg.require_base_url()
 
+    if args.source is None:
+        return _sync(args, cfg, lib)
+
     if _is_audio(args.source):
         mp3, meta, seconds, description = _adopt_audio(args, lib)
     else:
@@ -540,6 +553,89 @@ def cmd_publish(args) -> int:
         print(f"cover     {cover[1]}")
     print(f"feed      {url}")
     return 0
+
+
+def _sync(args, cfg, lib) -> int:
+    """``earmark publish`` with no SOURCE: make the feed match sources.yml.
+
+    Removals go first, so a filename a deleted entry held is free before
+    anything new is written. One entry failing -- a dead URL, a paywall -- is
+    reported and skipped rather than stopping the rest, and the exit status
+    says so afterwards. The feed is written once, at the end.
+    """
+    from earmark import sources as sources_mod
+    from earmark.feedops import Feed
+
+    listed = sources_mod.load(lib.root)
+    if not listed.exists:
+        raise FileNotFoundError(
+            f"no {sources_mod.FILENAME} in {lib.root}; name a SOURCE, or list some there"
+        )
+    for warning in listed.warnings:
+        print(f"warning: {warning}", file=sys.stderr)
+    if listed.errors:
+        raise ValueError(f"{listed.path}:\n  " + "\n  ".join(listed.errors))
+
+    feed = Feed.open(lib, cfg)
+    wanted = {entry.source for entry in listed.entries}
+    have = {e.listed for e in feed.state.episodes if e.listed}
+    doomed = [e for e in feed.listing() if e.listed and e.listed not in wanted]
+    new = [entry for entry in listed.entries if entry.source not in have]
+
+    if not doomed and not new:
+        print(f"up to date: {len(have)} listed episode(s)")
+        # A new library still gets a feed, so it can be subscribed to before
+        # anything is listed.
+        print(f"feed      {feed.url if lib.feed_path.exists() else feed.write()}")
+        return 0
+
+    if args.dry_run:
+        for episode in doomed:
+            print(f"would remove  {episode.title}")
+        for entry in new:
+            print(f"would add     {entry.source}")
+        return 0
+
+    if doomed:
+        _print_doomed(feed, doomed)
+        feed.remove(doomed)
+
+    failed = 0
+    for entry in new:
+        entry_args = argparse.Namespace(**{**vars(args), **entry.overrides,
+                                           "source": entry.path(lib.root)})
+        try:
+            result, _ = _render(entry_args, cfg, lib)
+            episode = feed.add(result.path, result.meta, result.seconds,
+                               description=result.excerpt, listed=entry.source)
+        except Exception as exc:  # one bad entry must not cost the others
+            failed += 1
+            print(f"earmark: {entry.source}: {exc}", file=sys.stderr)
+            continue
+        print(f"published {episode.filename}")
+
+    cover = feed.refresh_cover()
+    if cover:
+        print(f"cover     {cover[1]}")
+    print(f"feed      {feed.write()}")
+    if failed:
+        print(f"earmark: {failed} of {len(new)} new entries failed", file=sys.stderr)
+    return 1 if failed else 0
+
+
+def _print_doomed(feed, doomed) -> None:
+    """Name every file that goes, not just the episode.
+
+    Removing a document takes its Markdown too, and that is the half the user
+    may have hand-edited.
+    """
+    print("\nremoving:")
+    root = feed.library.root
+    for episode in doomed:
+        print(f"  {episode.title}")
+        for path in [feed.site.path_for(episode.name), *feed.leftovers(episode)]:
+            if path.is_file():
+                print(f"    {path.relative_to(root)}")
 
 
 def _adopt_audio(args, lib):
@@ -668,15 +764,7 @@ def _remove_episodes(feed, args) -> int:
         print("nothing removed.")
         return 0
 
-    # Name every file that goes, not just the episode. Removing a document
-    # takes its Markdown too, and that is the half the user may have hand-edited.
-    print("\nremoving:")
-    root = feed.library.root
-    for episode in doomed:
-        print(f"  {episode.title}")
-        for path in [feed.site.path_for(episode.name), *feed.leftovers(episode)]:
-            if path.is_file():
-                print(f"    {path.relative_to(root)}")
+    _print_doomed(feed, doomed)
     if not args.yes and sys.stdin.isatty() and sys.stdout.isatty():
         # Nothing here is undoable from the library; only re-running
         # `earmark publish` on the original source brings a document back.

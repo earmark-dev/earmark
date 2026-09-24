@@ -440,3 +440,125 @@ def test_a_path_outside_the_working_directory_stays_absolute(lib, paper, monkeyp
     monkeypatch.chdir(elsewhere)
     main(["text", str(paper), "--library", str(lib.root)])
     assert str(lib.markdown_path("on-reading-things")) in capsys.readouterr().out
+
+
+# -- sync: publish with no SOURCE makes the feed match sources.yml -------
+
+
+def _doc(lib, name, title):
+    path = lib.root / "files" / f"{name}.md"
+    path.parent.mkdir(exist_ok=True)
+    path.write_text(f"# {title}\n\nThe body of {title}, which is short.\n", encoding="utf-8")
+    return f"files/{name}.md"
+
+
+def _list(lib, *entries):
+    (lib.root / "sources.yml").write_text("".join(f"- {e}\n" for e in entries), encoding="utf-8")
+
+
+def _titles(lib):
+    from earmark.feed import FeedState
+
+    return sorted(e.title for e in FeedState.from_json(lib.state_path.read_text()).episodes)
+
+
+def test_init_writes_a_sources_list_sync_accepts(lib, capsys):
+    """A fresh library must sync cleanly, not fail on its own template."""
+    assert (lib.root / "sources.yml").is_file()
+    assert main(["publish", "--library", str(lib.root)]) == 0
+    assert "up to date" in capsys.readouterr().out
+    # The feed exists before anything is listed, so the URL the first Action
+    # run prints can be subscribed to straight away instead of 404ing.
+    assert lib.feed_path.is_file()
+
+
+@needs_ffmpeg
+def test_sync_publishes_every_new_entry_and_only_once(lib, backend):
+    _list(lib, _doc(lib, "one", "Paper One"), _doc(lib, "two", "Paper Two"))
+    assert main(["publish", "-q", "--library", str(lib.root)]) == 0
+    assert _titles(lib) == ["Paper One", "Paper Two"]
+
+    backend.calls.clear()
+    assert main(["publish", "-q", "--library", str(lib.root)]) == 0
+    assert backend.calls == [], "a second sync re-synthesized a listed entry"
+
+
+@needs_ffmpeg
+def test_deleting_an_entry_deletes_its_episode_audio_and_text(lib):
+    one, two = _doc(lib, "one", "Paper One"), _doc(lib, "two", "Paper Two")
+    _list(lib, one, two)
+    main(["publish", "-q", "--library", str(lib.root)])
+
+    _list(lib, two)
+    assert main(["publish", "-q", "--library", str(lib.root)]) == 0
+    assert _titles(lib) == ["Paper Two"]
+    assert not lib.audio_path("paper-one").exists()
+    assert not lib.markdown_path("paper-one").exists()
+    assert lib.audio_path("paper-two").exists()
+
+
+@needs_ffmpeg
+def test_sync_never_touches_an_episode_published_by_hand(lib, paper):
+    main(["publish", str(paper), "-q", "--library", str(lib.root)])
+    _list(lib, _doc(lib, "one", "Paper One"))
+    main(["publish", "-q", "--library", str(lib.root)])
+    (lib.root / "sources.yml").write_text("# emptied\n", encoding="utf-8")
+    assert main(["publish", "-q", "--library", str(lib.root)]) == 0
+    assert _titles(lib) == ["On Reading Things"]
+
+
+@needs_ffmpeg
+def test_one_bad_entry_does_not_stop_the_rest(lib, monkeypatch, capsys):
+    """In an Action a dead link must not cost every other new episode."""
+    import earmark.cli as cli_mod
+
+    good = _doc(lib, "good", "Good Paper")
+    bad = _doc(lib, "bad", "Bad Paper")
+    real = cli_mod._render
+
+    def flaky(args, cfg, library, **kw):
+        if args.source.endswith("bad.md"):
+            raise RuntimeError("403 Forbidden")
+        return real(args, cfg, library, **kw)
+
+    monkeypatch.setattr(cli_mod, "_render", flaky)
+    _list(lib, bad, good)
+    assert main(["publish", "-q", "--library", str(lib.root)]) == 1
+    assert _titles(lib) == ["Good Paper"]
+    assert "403 Forbidden" in capsys.readouterr().err
+
+
+@needs_ffmpeg
+def test_an_entry_can_override_the_title(lib):
+    one = _doc(lib, "one", "Paper One")
+    (lib.root / "sources.yml").write_text(f"- source: {one}\n  title: My Name For It\n",
+                                          encoding="utf-8")
+    assert main(["publish", "-q", "--library", str(lib.root)]) == 0
+    assert _titles(lib) == ["My Name For It"]
+
+
+def test_a_broken_list_stops_before_removing_anything(lib, capsys):
+    """Reading half a list and syncing to it would delete the other half."""
+    from earmark.feed import Episode, FeedState, save
+
+    save(FeedState(episodes=[Episode(id="a1", title="Kept", filename="kept.mp3", bytes=1,
+                                     seconds=1, published="2026-01-01",
+                                     listed="https://example.com/kept")]), lib.state_path)
+    (lib.root / "sources.yml").write_text("- https://example.com/kept\n- files/nope.pdf\n",
+                                          encoding="utf-8")
+    assert main(["publish", "--library", str(lib.root)]) == 1
+    assert "nope.pdf" in capsys.readouterr().err
+    assert _titles(lib) == ["Kept"]
+
+
+def test_no_list_at_all_is_an_error_not_an_empty_feed(lib, capsys):
+    (lib.root / "sources.yml").unlink()
+    assert main(["publish", "--library", str(lib.root)]) == 1
+    assert "sources.yml" in capsys.readouterr().err
+
+
+def test_dry_run_sync_changes_nothing(lib, backend, capsys):
+    _list(lib, _doc(lib, "one", "Paper One"))
+    assert main(["publish", "--dry-run", "--library", str(lib.root)]) == 0
+    assert "would add" in capsys.readouterr().out
+    assert backend.calls == [] and not lib.state_path.exists()

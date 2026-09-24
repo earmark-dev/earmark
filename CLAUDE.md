@@ -25,8 +25,8 @@ is the least guessable thing about the design.
 
 ## The library is the unit
 
-A **library** is a folder holding `earmark.toml`, `text/*.md`, `audio/*.mp3`,
-`feed.xml`, `episodes.json` and `cover.jpg`. It is meant to be a folder served
+A **library** is a folder holding `earmark.toml`, `sources.yml`, `text/*.md`,
+`audio/*.mp3`, `feed.xml`, `episodes.json` and `cover.jpg`. It is meant to be a folder served
 on the public web, so writing the MP3 *is* publishing it.
 
 **There is no `library` config key and there must never be one.** The library
@@ -127,7 +127,8 @@ re-synthesis free; `--remove` means "I do not want this document", and leaving
 its text behind makes the user delete the same thing twice. `Feed.leftovers()`
 is where that list of extra files lives — everything downstream of a document
 is named from the same slug, which is the only link back, since an episode has
-no record of the source that produced it. `earmark feed` numbers its listing and
+no record of the source that produced it (except `listed`, and only for an
+episode sync published). `earmark feed` numbers its listing and
 `Feed.listing()` is the single definition of that order, so `--remove 3` and
 line 3 cannot drift apart. A number is a **position, not an identity** —
 publishing renumbers everything — which is why `--remove` always prints the
@@ -136,6 +137,44 @@ the default.
 
 `feed.py` renders XML from `episodes.json` and never parses XML back.
 `feedops.py` combines the two. Keep those three separate.
+
+### `sources.yml` and sync
+
+`earmark publish` with no SOURCE makes the feed match `sources.yml`
+(`earmark/sources.py`): unlisted entries are published, and episodes whose
+entry was deleted are removed the way `--remove` removes them. This is a mode
+of `publish`, not an eighth command. It exists so a library can be a GitHub
+repo that publishes itself (see below).
+
+- An entry is identified by its `source` string exactly as written, stored on
+  the episode as `Episode.listed`. **`listed` is never rendered into
+  `feed.xml`**: it can be a local path. Episodes with no `listed` were published
+  by hand and **sync never removes them**.
+- A list with any error stops the sync **before anything is removed**. Reading
+  half a list and syncing to it would delete the other half. For the same
+  reason a missing `sources.yml` is an error, not an empty list, while a file
+  of only comments (the template) is an empty list.
+- One entry failing at render time is reported and skipped; the rest publish
+  and the exit status is 1. In an Action, a dead link must not cost the others.
+- `feed --prune` and sync fight: a pruned episode that is still listed is
+  re-narrated on the next sync. In a synced library, the list is the size cap.
+
+`Feed.add` replaces any episode with the same digest **or the same filename**.
+Filenames follow the slug, so a re-render of an edited document overwrites the
+MP3 in place, and keeping the old entry listed one file twice.
+
+`Feed.orphans()` only ever reports audio. A library can be a git repo whose
+root holds a README, `.nojekyll`, `.gitignore` and `sources.yml`, and
+`--prune --orphans` must never delete those.
+
+### The GitHub Action
+
+`action.yml` at the repo root is a composite Action (`uses: jhelvy/earmark@v1`)
+that installs earmark from its own checkout (`github.action_path`), so the tag
+a workflow names is the earmark version it runs. It caches the model, runs
+`earmark init` on the first run with a `base_url` derived from the repo name,
+runs `earmark publish`, refuses files over GitHub's 100 MB limit, and commits
+back. `template/` is the content of the `jhelvy/earmark-library` template repo.
 
 ### Episode filenames follow the slug
 

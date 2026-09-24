@@ -65,6 +65,7 @@ The other four commands are setup and housekeeping: `init`, `config`,
 | [Choosing a voice](https://jhelvy.github.io/earmark/user-guide/voices.html) | 54 voices and how to pick one |
 | [Publishing anywhere](https://jhelvy.github.io/earmark/user-guide/publishing.html) | GitHub Pages, rclone, rsync: one line each |
 | [Subscribing on your phone](https://jhelvy.github.io/earmark/user-guide/subscribing.html) | where the feed URL goes in each app |
+| [Running on GitHub](https://jhelvy.github.io/earmark/user-guide/github.html) | a repo that narrates and publishes itself, nothing installed |
 | [Reference](https://jhelvy.github.io/earmark/reference/) | every command, flag and config key |
 
 ## Development

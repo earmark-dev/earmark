@@ -34,6 +34,9 @@ class Episode:
     author: str | None = None
     source: str | None = None
     description: str = ""
+    # The sources.yml entry this episode was published from, exactly as written.
+    # Sync matches on it; it never reaches feed.xml.
+    listed: str | None = None
 
     @property
     def name(self) -> str:
