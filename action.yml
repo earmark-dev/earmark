@@ -38,7 +38,11 @@ outputs:
 runs:
   using: composite
   steps:
+    # No uv cache: a library has no lockfile to key it on, so setup-uv warns
+    # that the cache would never be invalidated. The model has its own cache.
     - uses: astral-sh/setup-uv@v10.2.0
+      with:
+        enable-cache: false
 
     - name: Install earmark and ffmpeg
       shell: bash
