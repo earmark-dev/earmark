@@ -64,7 +64,9 @@ def test_guid_is_not_a_permalink(state):
 
 
 def test_state_round_trips(state):
-    assert FeedState.from_json(state.to_json()).episodes[0].title == "First"
+    # Every field, not one: a field missing from to_json or from_json would
+    # silently drop out of episodes.json on the next publish.
+    assert FeedState.from_json(state.to_json()) == state
 
 
 @pytest.mark.parametrize(

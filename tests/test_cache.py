@@ -11,6 +11,9 @@ def test_key_changes_with_every_input():
     assert cache.key(**{**base, "voice": "af_bella"}) != baseline
     assert cache.key(**{**base, "speed": 1.1}) != baseline
     assert cache.key(**{**base, "lang": "en-gb"}) != baseline
+    # Pauses are baked into the cached samples, so they are part of the key.
+    assert cache.key(**base, pause_before=0.5) != baseline
+    assert cache.key(**base, pause_after=0.5) != baseline
     assert cache.key(**base) == baseline
 
 
