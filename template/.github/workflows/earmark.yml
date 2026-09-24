@@ -20,6 +20,9 @@ concurrency:
 
 jobs:
   publish:
+    # Never in the template itself: a run there would commit an earmark.toml
+    # with the template's own base_url into every repo made from it.
+    if: ${{ !github.event.repository.is_template }}
     runs-on: ubuntu-latest
     timeout-minutes: 300
     steps:
