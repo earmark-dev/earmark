@@ -17,7 +17,8 @@ lang = "en-gb"      # en-gb for a British voice, en-us for an American one
 
 Commit the change, or save it locally. Every episode made after that uses the
 new voice and speed. Episodes you already have keep the voice they were made
-with.
+with. On GitHub, delete an episode's MP3 in `audio/` to dictate it again with
+the new voice.
 
 You do not need to repeat these settings in `sources.yml`. An entry uses them
 unless it sets its own.
@@ -40,8 +41,9 @@ When one setting is in more than one place, the more specific one wins:
 3. the built-in default
 
 A setting changes new episodes only. To make an existing episode again with a
-new setting, see [Remove something](../github/add.qmd#remove-something) on
-GitHub, or use `earmark publish SOURCE --refresh` locally.
+new setting, delete its MP3 on GitHub (see [Dictate something
+again](../github/add.qmd#dictate-something-again)), or run `earmark publish
+SOURCE --refresh` locally.
 
 ## The voice
 

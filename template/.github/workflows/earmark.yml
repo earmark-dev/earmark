@@ -1,13 +1,14 @@
 # Dictate everything in sources.yml and publish it on GitHub Pages.
 #
-# Runs when sources.yml, a file under files/, or earmark.toml changes, and on
-# demand from the Actions tab. The first run also writes earmark.toml.
+# Runs when sources.yml, a file under files/, earmark.toml or audio/ changes,
+# and on demand from the Actions tab. Deleting an MP3 in audio/ dictates that
+# entry again. The first run also writes earmark.toml.
 name: earmark
 
 on:
   push:
     branches: [main]
-    paths: [sources.yml, "files/**", earmark.toml, .github/workflows/earmark.yml]
+    paths: [sources.yml, "files/**", "audio/**", earmark.toml, .github/workflows/earmark.yml]
   workflow_dispatch:
 
 permissions:

@@ -19,7 +19,10 @@ Edit [`sources.yml`](sources.yml) and add a line such as
 `- https://example.com/an-article`, then commit. For a PDF or a Word file,
 upload it into [`files/`](files) first, then list it as `- files/name.pdf`.
 
-To remove an episode, delete its line from `sources.yml`.
+To remove an episode, delete its line from `sources.yml`. To dictate an
+episode again, for example after changing the voice, delete its MP3 in
+[`audio/`](audio). Deleting only the MP3 never removes an episode: the next run
+makes it again.
 
 ## Changing the voice or the speed
 
@@ -33,7 +36,8 @@ speed = 1.1         # 0.5 to 2.0
 lang = "en-gb"      # en-gb for a British voice, en-us for an American one
 ```
 
-A change applies to episodes made after it, not to the ones you already have.
+A change applies to episodes made after it. To apply it to an episode you
+already have, delete that episode's MP3 in `audio/`.
 To give one entry its own voice, write it as a mapping in `sources.yml`:
 
 ```yaml

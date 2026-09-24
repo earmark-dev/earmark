@@ -3,9 +3,10 @@ title: Add and remove
 description: Edit sources.yml to add and remove episodes, and earmark.toml to change the settings.
 ---
 
-Everything you do after setup is an edit to one file, `sources.yml`. Each
-entry in it is one episode. Each commit to it starts a run that dictates the
-new entries and removes the deleted ones.
+After setup, you edit one file, `sources.yml`. Each entry in it is one
+episode. Each commit starts a run that makes the episodes match the list: it
+dictates new entries, removes deleted ones, and dictates again any entry whose
+MP3 is missing.
 
 ## Add something
 
@@ -34,12 +35,19 @@ done, pull to refresh in your podcast app.
 
 ## Remove something
 
-Delete the entry's line and commit. The next run removes the episode, its MP3
-and its text.
+Delete the entry's line in `sources.yml` and commit. The next run removes the
+episode, its MP3 and its text.
 
-An entry is matched by its exact text. Editing an entry's `voice` therefore does
-not dictate it again. To dictate an entry again, delete it, commit, then add it
-back.
+Deleting only the MP3 does not remove an episode. While the entry is still in
+`sources.yml`, the next run dictates it again.
+
+## Dictate something again
+
+Delete its MP3 in `audio/` and commit. The next run dictates it again with the
+current settings. Do this after you change the voice, the speed or a
+`[replace]` word, because a change to a setting only applies to new episodes.
+
+In the web editor, open `audio/`, click the MP3, then **⋯ → Delete file**.
 
 ## Change the settings
 

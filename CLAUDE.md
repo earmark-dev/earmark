@@ -156,6 +156,10 @@ repo that publishes itself (see below).
   of only comments (the template) is an empty list.
 - One entry failing at render time is reported and skipped; the rest publish
   and the exit status is 1. In an Action, a dead link must not cost the others.
+- A listed episode whose MP3 is missing counts as not published, so sync
+  dictates it again. On GitHub, deleting the MP3 is how a user re-dictates an
+  entry after a settings change; the template workflow triggers on `audio/**`
+  for that reason. Deleting the entry is how they remove one.
 - `feed --prune` and sync fight: a pruned episode that is still listed is
   re-narrated on the next sync. In a synced library, the list is the size cap.
 
