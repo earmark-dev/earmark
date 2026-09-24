@@ -448,6 +448,18 @@ def test_deleting_an_entry_deletes_its_episode_audio_and_text(lib):
 
 
 @needs_ffmpeg
+def test_sync_dictates_a_listed_entry_again_when_its_mp3_is_gone(lib):
+    """A hand-deleted MP3 must not leave a feed entry that 404s."""
+    _list(lib, _doc(lib, "one", "Paper One"))
+    main(["publish", "-q", "--library", str(lib.root)])
+    lib.audio_path("paper-one").unlink()
+
+    assert main(["publish", "-q", "--library", str(lib.root)]) == 0
+    assert lib.audio_path("paper-one").exists(), "sync called the entry up to date with no MP3"
+    assert _titles(lib) == ["Paper One"]
+
+
+@needs_ffmpeg
 def test_sync_never_touches_an_episode_published_by_hand(lib, paper):
     main(["publish", str(paper), "-q", "--library", str(lib.root)])
     _list(lib, _doc(lib, "one", "Paper One"))

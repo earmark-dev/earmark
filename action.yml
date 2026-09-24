@@ -90,10 +90,13 @@ runs:
 
     # GitHub rejects any file over 100 MB, and one rejected file fails the
     # whole push. Stop here with a reason rather than there with a git error.
+    # A library with no episodes has no audio folder, and find would fail on
+    # it; under bash -e that ends the step with no message at all.
     - name: Check file sizes
       shell: bash
       run: |
-        big=$(find audio -type f -size +95M 2>/dev/null)
+        [ -d audio ] || exit 0
+        big=$(find audio -type f -size +95M)
         if [ -n "$big" ]; then
           echo "::error::over GitHub's 100 MB file limit: $big. Lower bitrate in earmark.toml or split the document."
           exit 1

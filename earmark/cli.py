@@ -578,7 +578,10 @@ def _sync(args, cfg, lib) -> int:
 
     feed = Feed.open(lib, cfg)
     wanted = {entry.source for entry in listed.entries}
-    have = {e.listed for e in feed.state.episodes if e.listed}
+    # An episode whose MP3 is gone counts as missing, so it is dictated again.
+    # Otherwise a file deleted by hand stays listed in the feed and 404s.
+    have = {e.listed for e in feed.state.episodes
+            if e.listed and feed.site.path_for(e.name).is_file()}
     doomed = [e for e in feed.listing() if e.listed and e.listed not in wanted]
     new = [entry for entry in listed.entries if entry.source not in have]
 
