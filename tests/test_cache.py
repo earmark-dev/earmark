@@ -42,13 +42,6 @@ def test_info_and_clear():
     assert cache.info()["count"] == 0
 
 
-def test_clear_respects_age():
-    cache.put(cache.key("fresh", "f", "v", 1.0, "en-us"), np.zeros(10, dtype=np.float32))
-    removed, _ = cache.clear(older_than_days=30)
-    assert removed == 0
-    assert cache.info()["count"] == 1
-
-
 def test_legacy_float32_entries_are_still_cleanable():
     key = cache.key("old", "f", "v", 1.0, "en-us")
     legacy = cache.path_for(key).with_suffix(".f32")

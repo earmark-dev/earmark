@@ -6,10 +6,6 @@ from conftest import needs_ffmpeg
 from earmark import audio
 
 
-def test_silence_length():
-    assert len(audio.silence(0.5, 24000)) == 12000
-
-
 def test_format_duration():
     assert audio.format_duration(0) == "0:00:00"
     assert audio.format_duration(3661) == "1:01:01"

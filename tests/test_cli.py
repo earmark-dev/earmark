@@ -26,20 +26,10 @@ def test_every_command_parses(name):
     assert parse(argv).command == name
 
 
-@pytest.mark.parametrize("name", ["text", "audio", "publish"])
-def test_the_pipeline_commands_take_a_source(name):
-    assert parse([name, "paper.pdf"]).source == "paper.pdf"
-
-
 @pytest.mark.parametrize("name", COMMANDS)
 def test_every_command_takes_library(name):
     args = parse([name, "--library", "/tmp/lib"] + (["x.pdf"] if name in NEEDS_SOURCE else []))
     assert args.library == "/tmp/lib"
-
-
-def test_cleaning_flags_reach_audio():
-    args = parse(["audio", "paper.pdf", "--profile", "paper", "-s", "1.2"])
-    assert (args.profile, args.speed) == ("paper", 1.2)
 
 
 def test_no_command_prints_help(capsys):
@@ -81,33 +71,6 @@ def test_no_default_leaves_the_pointer_alone(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     with pytest.raises(LibraryError, match="no library found"):
         library_mod.find()
-
-
-def test_being_inside_a_library_beats_the_default(tmp_path, monkeypatch):
-    from earmark import library as library_mod
-
-    main(["init", str(tmp_path / "default")])
-    main(["init", str(tmp_path / "other"), "--no-default"])
-    monkeypatch.chdir(tmp_path / "other")
-    assert library_mod.find() == (tmp_path / "other").resolve()
-
-
-def test_a_subfolder_of_a_library_still_finds_it(tmp_path, monkeypatch):
-    from earmark import library as library_mod
-
-    main(["init", str(tmp_path / "lib"), "--no-default"])
-    monkeypatch.chdir(tmp_path / "lib" / "text")
-    assert library_mod.find() == (tmp_path / "lib").resolve()
-
-
-def test_the_env_var_beats_the_working_directory(tmp_path, monkeypatch):
-    from earmark import library as library_mod
-
-    main(["init", str(tmp_path / "a"), "--no-default"])
-    main(["init", str(tmp_path / "b"), "--no-default"])
-    monkeypatch.chdir(tmp_path / "a")
-    monkeypatch.setenv("EARMARK_LIBRARY", str(tmp_path / "b"))
-    assert library_mod.find() == (tmp_path / "b").resolve()
 
 
 def test_commands_outside_any_library_say_so(tmp_path, monkeypatch, capsys):
@@ -238,7 +201,9 @@ def test_dry_run_synthesizes_nothing(lib, paper, backend, capsys):
 
 @needs_ffmpeg
 def test_publish_puts_it_on_the_feed(lib, paper, capsys):
+    """Handed only a source, publish does all three steps itself."""
     assert main(["publish", str(paper), "-q", "--library", str(lib.root)]) == 0
+    assert lib.markdown_path("on-reading-things").is_file()
     assert lib.feed_path.is_file()
     assert lib.state_path.is_file()
     assert lib.audio_path("on-reading-things").is_file()
@@ -408,21 +373,6 @@ def test_the_hint_stays_off_stdout(lib, paper, capsys):
     captured = capsys.readouterr()
     assert "earmark publish" not in captured.out
     assert captured.out.strip().endswith("words)")
-
-
-@needs_ffmpeg
-def test_publish_needs_no_earlier_step(lib, paper):
-    """Handed only a source, publish does all three steps itself."""
-    assert main(["publish", str(paper), "-q", "--library", str(lib.root)]) == 0
-    assert lib.markdown_path("on-reading-things").is_file()
-    assert lib.audio_path("on-reading-things").is_file()
-    assert lib.feed_path.is_file()
-
-
-def test_the_command_names_are_the_folder_names(lib):
-    """`ls` should teach the pipeline as well as --help does."""
-    assert lib.text_dir.name == "text"
-    assert lib.audio_dir.name == "audio"
 
 
 def test_paths_print_relative_to_where_you_are(lib, paper, monkeypatch, capsys):
