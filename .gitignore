@@ -8,6 +8,8 @@ dist/
 build/
 *.egg-info/
 *.mp3
+# ...except the voice samples on the docs' Settings page (bin/voice-samples)
+!assets/voices/*.mp3
 *.onnx
 *.bin
 .DS_Store

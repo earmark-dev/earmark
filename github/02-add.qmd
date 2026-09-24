@@ -28,7 +28,9 @@ too), add a line, and commit:
   `voice`, `speed` or `profile`. See the [`sources.yml`
   reference](../reference/configuration.qmd#sources.yml).
 
-The run takes a few minutes. Then pull to refresh in your podcast app.
+A run takes about half as long as the audio it makes, so a 25-minute article
+takes about 12 minutes. The **Actions** tab shows its progress. When it is
+done, pull to refresh in your podcast app.
 
 ## Remove something
 
