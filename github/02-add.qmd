@@ -43,9 +43,8 @@ back.
 
 The first run writes `earmark.toml` into the repo. Edit it in the web editor to
 change the defaults for new episodes: the voice, the speed, the feed title, or
-the cover image. Every key is in the [configuration
-reference](../reference/configuration.qmd). To hear the voices before you
-choose, see the [Kokoro voice list](https://huggingface.co/hexgrad/Kokoro-82M/blob/main/VOICES.md).
+the cover image. [Settings](../settings/index.qmd) lists every setting you can
+change, in `earmark.toml` or on one entry in `sources.yml`.
 
 ## Limits
 

@@ -21,8 +21,10 @@ Install the command-line tool and run
 `earmark publish https://example.com/article`. Host the library on pCloud, a
 storage bucket or your own server.
 
-The [Reference](https://earmark-dev.github.io/earmark/reference/) lists every
-command, flag and setting.
+[Settings](https://earmark-dev.github.io/earmark/settings/) shows how to change
+the voice, the speed and everything else. The
+[Reference](https://earmark-dev.github.io/earmark/reference/) lists every
+command, flag and configuration key.
 
 ## Development
 

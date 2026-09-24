@@ -288,13 +288,15 @@ rebuild moves them.
   to run earmark, declared under `sections:` in `great-docs.yml`:
   `github/NN-name.qmd` ("Use it on GitHub": setup, add and remove, subscribe;
   the recommended route) and `local/NN-name.qmd` ("Use it locally": install,
-  use, hosting). Keep it that short. Detail belongs in `reference/`, and design
+  use, hosting). A third section, `settings/index.qmd`, is one page of every
+  setting a user tunes, shown three ways: `earmark.toml`, a `sources.yml` entry
+  and a flag. Keep it that short. Detail belongs in `reference/`, and design
   rationale belongs here, not in the guide. The `NN-` prefix orders the sidebar
   and is stripped from the title and the URL, so link to `02-add.qmd` from the
   same section and to `../github/add.qmd` from another.
 - Guide screenshots live in `assets/screenshots/` (a resource directory, so
   they are served) and are shown with `../assets/screenshots/<name>.png`.
-  `test_guide_images_exist` fails on a missing one.
+  Voice samples live in `assets/voices/`, made by `bin/voice-samples`. `test_guide_media_exist` fails on a missing screenshot or sample.
 - **earmark *dictates*; it does not *narrate*.** The audio is a word-for-word
   reading of the cleaned text, not a summary or a podcast-style show. Use
   "dictate" in every user-facing string: docs, help text, templates.

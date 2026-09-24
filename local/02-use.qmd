@@ -62,7 +62,8 @@ earmark publish paper.pdf --voice bf_emma --speed 1.1
 ```
 
 To change the defaults, run `earmark config`, which opens `earmark.toml` in
-your editor.
+your editor. [Settings](../settings/index.qmd) lists every setting you can
+change, and where.
 
 ## Use a reading list
 

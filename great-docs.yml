@@ -65,15 +65,19 @@ hero:
   tagline: "Turn articles into dictated audio, then publish to a public podcast feed"
 
 # No user_guide/ directory, so there is no "User Guide" link. The guide is two
-# navbar sections instead, one per way to run earmark, then the reference.
+# navbar sections instead, one per way to run earmark, then one page of the
+# settings both ways share, then the reference.
 sections:
   - title: Use it on GitHub
     dir: github
   - title: Use it locally
     dir: local
     navbar_after: Use it on GitHub
+  - title: Settings
+    dir: settings
+    navbar_after: Use it locally
   - title: Reference
     dir: reference
-    navbar_after: Use it locally
+    navbar_after: Settings
 
 dark_mode_toggle: true
