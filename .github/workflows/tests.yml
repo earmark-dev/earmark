@@ -1,0 +1,31 @@
+name: CI Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test:
+    name: "Run tests"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: astral-sh/setup-uv@v10.2.0
+
+      # The tests use a fake speech backend, so the Kokoro model is never
+      # downloaded. ffmpeg is needed for real: without it the tests marked
+      # needs_ffmpeg skip rather than fail, which would hide a broken encoder.
+      - name: Install ffmpeg
+        run: command -v ffmpeg >/dev/null || { sudo apt-get update -q && sudo apt-get install -y -q ffmpeg; }
+
+      - name: Install earmark
+        run: |
+          uv venv --python 3.12
+          uv pip install -e ".[dev]"
+
+      # -rs lists every skipped test, so a skip that should have run shows up.
+      - name: Run tests
+        run: .venv/bin/python -m pytest -q -rs
