@@ -1,4 +1,4 @@
-# Narrate everything in sources.yml and publish it on GitHub Pages.
+# Dictate everything in sources.yml and publish it on GitHub Pages.
 #
 # Runs when sources.yml, a file under files/, or earmark.toml changes, and on
 # demand from the Actions tab. The first run also writes earmark.toml.

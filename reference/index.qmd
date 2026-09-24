@@ -21,7 +21,7 @@ Plus [`earmark.toml`](configuration.qmd): every configuration key.
 
 ```
 earmark text    SOURCE   ->  text/<name>.md     look at it, fix it
-earmark audio   SOURCE   ->  audio/<name>.mp3   narrate it
+earmark audio   SOURCE   ->  audio/<name>.mp3   dictate it
 earmark publish SOURCE   ->  feed.xml           all of the above
 ```
 

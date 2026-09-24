@@ -17,7 +17,7 @@ can go back and fix something without re-extracting. Does not touch the feed.
 |---|---|
 | `SOURCE` | a file path, a Markdown file, or a URL |
 
-A Markdown file carrying `earmark: cleaned` is narrated verbatim. Anything else
+A Markdown file carrying `earmark: cleaned` is dictated verbatim. Anything else
 goes through the cleaner first.
 
 ## Voice options
@@ -90,5 +90,4 @@ The first run prompts before downloading the 354 MB Kokoro model. After every
 run the chunk cache prunes itself: entries untouched for 90 days go, then least
 recently used above 2 GB.
 
-See also: [Choosing a voice](../user-guide/voices.qmd), [Speed, caching and
-housekeeping](../user-guide/housekeeping.qmd).
+See also: [Use the CLI](../local/use.qmd).

@@ -8,7 +8,7 @@ earmark publish [SOURCE] [voice options] [audio options] [behaviour options]
                 [metadata options] [cleaning options]
 ```
 
-Runs the whole chain. Extracts, cleans, narrates, writes `audio/<name>.mp3`,
+Runs the whole chain. Extracts, cleans, dictates, writes `audio/<name>.mp3`,
 adds the episode to `feed.xml`, normalizes the cover, and runs the
 `after_publish` hook from inside the library.
 
@@ -24,7 +24,7 @@ other two commands are optional.
 
 An existing `.mp3`, `.m4a` or `.wav` is **adopted** onto the feed with no
 synthesis at all, which is how a recording made elsewhere ends up in the same
-feed as the things earmark narrated.
+feed as the things earmark dictated.
 
 ## With no SOURCE: make the feed match `sources.yml`
 
@@ -41,7 +41,7 @@ feed as the things earmark narrated.
   episodes that came from the list can leave because of it.
 
 An entry is matched by its `source` string exactly as written. Changing an
-entry's `voice` therefore does not re-narrate it; delete the entry, sync, and
+entry's `voice` therefore does not dictate it again; delete the entry, sync, and
 add it back.
 
 One entry failing, such as a dead link, does not stop the others. It is
@@ -53,7 +53,7 @@ is removed.
 other flags apply to every new entry, below anything the entry sets itself.
 
 This is how a library in a GitHub repo publishes itself. See
-[Running on GitHub](../user-guide/github.qmd).
+[Use it on GitHub](../github/setup.qmd).
 
 ## Options
 
@@ -74,7 +74,7 @@ Every flag of [`earmark audio`](audio.qmd), unchanged:
 publishing stops with a message telling you to run `earmark config`.
 
 If your library is not already a folder on the web, set `after_publish` to one
-line of shell. See [Publishing anywhere](../user-guide/publishing.qmd).
+line of shell. See [Host a library](../local/hosting.qmd).
 
 ## Re-publishing
 

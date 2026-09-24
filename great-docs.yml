@@ -62,11 +62,18 @@ seo:
   title_template: "{page_title}"
 
 hero:
-  tagline: "Turn articles into narrated audio, then publish to a public podcast feed"
+  tagline: "Turn articles into dictated audio, then publish to a public podcast feed"
 
+# No user_guide/ directory, so there is no "User Guide" link. The guide is two
+# navbar sections instead, one per way to run earmark, then the reference.
 sections:
+  - title: Use it on GitHub
+    dir: github
+  - title: Use it locally
+    dir: local
+    navbar_after: Use it on GitHub
   - title: Reference
     dir: reference
-    navbar_after: "User Guide"
+    navbar_after: Use it locally
 
 dark_mode_toggle: true

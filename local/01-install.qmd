@@ -1,0 +1,53 @@
+---
+title: Install
+description: Install the earmark command-line tool on your own computer.
+---
+
+The GitHub setup needs no install. Install the command-line tool only if you
+want to dictate on your own computer, for example to edit text before it is
+dictated, or to host your library somewhere other than GitHub.
+
+You need [uv](https://docs.astral.sh/uv/) and `ffmpeg`. Install `ffmpeg` for
+your platform:
+
+::: {.panel-tabset}
+
+## macOS
+
+```bash
+brew install ffmpeg
+```
+
+## Linux
+
+```bash
+sudo apt install ffmpeg     # Debian, Ubuntu
+sudo dnf install ffmpeg     # Fedora
+```
+
+## Windows
+
+```powershell
+winget install Gyan.FFmpeg
+```
+
+Open a new terminal afterwards so that `ffmpeg` is on your `PATH`. Windows is
+expected to work, but it is not tested.
+
+:::
+
+Then install earmark:
+
+```bash
+uv tool install --python 3.12 git+https://github.com/earmark-dev/earmark
+earmark --version
+```
+
+`--python 3.12` is necessary. The speech model does not support Python 3.13
+or newer, so uv downloads Python 3.12 for earmark.
+
+The first time you dictate something, earmark asks to download the 354 MB
+speech model. This happens once. The model is stored with your application
+data, not in your library.
+
+Next: [Use the CLI](02-use.qmd).

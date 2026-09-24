@@ -16,7 +16,8 @@ import pytest
 from earmark import cli, config
 
 REFERENCE = Path(__file__).resolve().parent.parent / "reference"
-GUIDE = Path(__file__).resolve().parent.parent / "user_guide"
+# The guide sections, each ordered by an NN- prefix on its page names.
+GUIDES = [Path(__file__).resolve().parent.parent / d for d in ("github", "local")]
 
 
 def read(name: str) -> str:
@@ -84,8 +85,20 @@ def test_every_flag_is_documented():
     assert not missing, "undocumented flags: " + ", ".join(missing)
 
 
-def test_guide_pages_are_numbered_uniquely():
-    prefixes = [p.name[:2] for p in GUIDE.glob("*.qmd")]
+@pytest.mark.parametrize("guide", GUIDES, ids=lambda d: d.name)
+def test_guide_pages_are_numbered_uniquely(guide):
+    prefixes = [p.name[:2] for p in guide.glob("*.qmd")]
+    assert prefixes, f"no guide pages in {guide.name}/"
     assert len(prefixes) == len(set(prefixes)), "two guide pages share an order prefix"
-    for path in GUIDE.glob("*.qmd"):
+    for path in guide.glob("*.qmd"):
         assert re.match(r"^\d\d-", path.name), f"{path.name} has no NN- order prefix"
+
+
+def test_guide_images_exist():
+    root = Path(__file__).resolve().parent.parent
+    for guide in GUIDES:
+        for page in guide.glob("*.qmd"):
+            for src in re.findall(r"!\[[^\]]*\]\(([^)\s]+)", page.read_text(encoding="utf-8")):
+                if "://" not in src:
+                    path = (guide / src).resolve()
+                    assert path.is_file(), f"{page.relative_to(root)} shows missing image {src}"

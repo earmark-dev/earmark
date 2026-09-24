@@ -34,7 +34,7 @@ TEMPLATE = """\
 # earmark reading list
 #
 # `earmark publish` with no SOURCE makes the feed match this list: a new entry
-# is narrated and published, and deleting an entry deletes its episode.
+# is dictated and published, and deleting an entry deletes its episode.
 #
 # An entry is a URL, a file path relative to this folder, or a mapping with
 # `source:` plus any of: title, author, date, voice, speed, lang, profile.

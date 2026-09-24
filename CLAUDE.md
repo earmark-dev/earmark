@@ -114,7 +114,7 @@ There used to be four publishers (folder, rclone, command, github). They are
 gone. A GitHub Pages repo, an rclone remote and an rsync target are all one line
 of `after_publish`, which is a config key rather than a plugin system and covers
 every host without earmark knowing the name of one. **Do not add a publisher
-back.** Add a recipe to the README's table.
+back.** Add a recipe to the table in `local/03-hosting.qmd`.
 
 ### Two ways off the feed, and they are not the same question
 
@@ -274,26 +274,37 @@ rebuild moves them.
   asking great-docs for a declared `includes:` list.
 
   The shared body links to the *deployed* site
-  (`https://earmark-dev.github.io/earmark/user-guide/quickstart.html`) instead of
-  `user-guide/quickstart.qmd`: the same table has to work from GitHub's README
+  (`https://earmark-dev.github.io/earmark/github/setup.html`) instead of
+  `github/01-setup.qmd`: the same table has to work from GitHub's README
   view, where a relative `.qmd` path is a 404. The cost is that local preview
   navigation off the landing page goes to the live site.
 
-  Install instructions are **not** duplicated there. The partial names the three
-  prerequisites and links to `user_guide/01-installation.qmd`, which is the only
-  place the per-OS commands live.
+  Install instructions are **not** duplicated there. The partial links to
+  `local/01-install.qmd`, which is the only place the per-OS commands
+  live.
 - `great-docs.yml` (repo root) is the only committed config. `great-docs config`
   prints the full annotated template of everything it accepts.
-- `user_guide/NN-name.qmd` is the narrative, **read in order**; the `NN-`
-  prefix is the ordering mechanism and is stripped from the title and the URL.
+- **There is no `user_guide/`.** The guide is two navbar sections, one per way
+  to run earmark, declared under `sections:` in `great-docs.yml`:
+  `github/NN-name.qmd` ("Use it on GitHub": setup, add and remove, subscribe;
+  the recommended route) and `local/NN-name.qmd` ("Use it locally": install,
+  use, hosting). Keep it that short. Detail belongs in `reference/`, and design
+  rationale belongs here, not in the guide. The `NN-` prefix orders the sidebar
+  and is stripped from the title and the URL, so link to `02-add.qmd` from the
+  same section and to `../github/add.qmd` from another.
+- Guide screenshots live in `assets/screenshots/` (a resource directory, so
+  they are served) and are shown with `../assets/screenshots/<name>.png`.
+  `test_guide_images_exist` fails on a missing one.
+- **earmark *dictates*; it does not *narrate*.** The audio is a word-for-word
+  reading of the cleaned text, not a summary or a podcast-style show. Use
+  "dictate" in every user-facing string: docs, help text, templates.
 - `reference/*.qmd` is the lookup material: one page per command, plus
   `configuration.qmd`.
-- Both live at the repo root because that is where great-docs looks. A section
-  under `docs/` builds, but its output keeps the whole source path while the
-  guide is canonicalized to `user-guide/`, so cross-links stop being symmetric.
-- Guide pages link each other by their prefixed filename (`04-the-pipeline.qmd`)
-  — great-docs strips the prefix. Cross-section links use the *output* names:
-  `../reference/text.qmd` and `../user-guide/voices.qmd`.
+- All three live at the repo root. A section under `docs/` builds, but its
+  output keeps the whole source path, so cross-links stop being symmetric.
+- Pages in one section link each other by their prefixed filename
+  (`02-use.qmd`) — great-docs strips the prefix. Cross-section links use the
+  *output* names: `../reference/text.qmd` and `../local/use.qmd`.
 
 **The generated Python API reference is off** (`reference: false`), and so is
 runtime introspection (`dynamic: false`). earmark is a CLI; nobody writes

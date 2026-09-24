@@ -1,15 +1,16 @@
 # My earmark library
 
-A private podcast of things I meant to read, narrated by
+A private podcast feed of things I meant to read, dictated by
 [earmark](https://earmark-dev.github.io/earmark) and served by GitHub Pages.
 
 ## Setup (once)
 
 1. **Settings → Pages**: set *Source* to **Deploy from a branch**, branch
    **main**, folder **/ (root)**, then click Save.
-2. **Actions** tab: open the **earmark** workflow and click **Run workflow**.
-   This first run creates `earmark.toml`.
-3. When it finishes, the run's summary shows your feed URL. Paste it into your
+2. **Actions** tab: open the **earmark** workflow. Making this repo started a
+   first run, which creates `earmark.toml`. If there is no run, click **Run
+   workflow**.
+3. When the run finishes, its summary shows your feed URL. Paste it into your
    podcast app as a feed you add by URL.
 
 ## Adding something

@@ -1,0 +1,85 @@
+---
+title: Use the CLI
+description: Make a library, publish to it, and fix text before it is dictated.
+---
+
+## Make a library
+
+A library is a folder. earmark writes everything into it: the settings, the
+text, the MP3s and the feed. A podcast app must be able to download the folder's
+files from a public URL, so the folder must be served on the web. [Host a
+library](03-hosting.qmd) lists the services that can do this.
+
+```bash
+earmark init ~/pCloud\ Drive/public/earmark \
+  --base-url https://filedn.com/XXXX/earmark
+```
+
+`--base-url` is the public URL of the folder. `init` also makes this library
+your default, so the commands below work from any directory.
+
+## Publish something
+
+```bash
+earmark publish https://example.com/some-long-article
+earmark publish paper.pdf
+```
+
+`publish` extracts the text, cleans it for listening, dictates it, and adds the
+episode to `feed.xml`. A source can be a URL or a PDF, DOCX, PPTX, EPUB, HTML or
+Markdown file.
+
+To get your feed URL and a list of episodes:
+
+```bash
+earmark feed
+```
+
+Add that URL to your podcast app, as described in
+[Subscribe](../github/subscribe.qmd).
+
+## Fix the text before it is dictated
+
+Extraction is not perfect. To correct the text first, stop after the text step:
+
+```bash
+earmark text paper.pdf               # prints the path it wrote, e.g. text/some-paper.md
+# edit text/some-paper.md
+earmark publish text/some-paper.md   # dictates your edited file
+```
+
+earmark never re-cleans a file that it wrote, so your edits stay. Dictation is
+cached, so a second publish dictates again only the parts you changed.
+
+`earmark audio SOURCE` dictates without adding to the feed.
+
+## Choose a voice
+
+```bash
+earmark voices                       # list the voices, with quality grades
+earmark voices --try bf_emma         # hear one
+earmark publish paper.pdf --voice bf_emma --speed 1.1
+```
+
+To change the defaults, run `earmark config`, which opens `earmark.toml` in
+your editor.
+
+## Use a reading list
+
+A local library can use `sources.yml` in the same way as the [GitHub
+setup](../github/setup.qmd). `init` creates the file. List your sources in it, then
+run `earmark publish` with no source:
+
+```bash
+earmark publish                      # add new entries, remove deleted ones
+earmark publish --dry-run            # show the changes only
+```
+
+## Remove episodes
+
+```bash
+earmark feed --remove                # choose episodes from a numbered list
+earmark feed --prune --keep 20       # keep only the newest 20
+```
+
+Every command and flag is in the [Reference](../reference/index.qmd).

@@ -12,7 +12,7 @@
 # tag the workflow names. A push made with GITHUB_TOKEN never triggers another
 # workflow run, so committing back cannot loop.
 name: earmark
-description: Narrate everything in sources.yml and publish it as a podcast feed on GitHub Pages.
+description: Dictate everything in sources.yml and publish it as a podcast feed on GitHub Pages.
 author: John Paul Helveston
 branding:
   icon: headphones
@@ -38,7 +38,7 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: astral-sh/setup-uv@v6
+    - uses: astral-sh/setup-uv@v10.2.0
 
     - name: Install earmark and ffmpeg
       shell: bash
@@ -49,7 +49,7 @@ runs:
     # 354 MB. Keyed on earmark.toml because that is where `model` is chosen;
     # restore-keys means an unrelated config edit still starts from a hit.
     - name: Restore the Kokoro model
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: ~/.local/share/earmark/models
         key: earmark-models-${{ hashFiles('earmark.toml') }}

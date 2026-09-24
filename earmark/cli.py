@@ -27,12 +27,12 @@ EPILOG = """\
 the pipeline: a source becomes text, text becomes audio, audio goes on your feed.
 
   earmark text    SOURCE   ->  text/<name>.md     look at it, fix it
-  earmark audio   SOURCE   ->  audio/<name>.mp3   narrate it
+  earmark audio   SOURCE   ->  audio/<name>.mp3   dictate it
   earmark publish SOURCE   ->  feed.xml           all of the above
 
 publish runs the whole chain, so `earmark publish paper.pdf` is all you need.
 The other two exist for when you want to stop partway -- to fix a mangled
-equation in the Markdown, or to narrate something without publishing it.
+equation in the Markdown, or to dictate something without publishing it.
 
 With no SOURCE, `earmark publish` makes the feed match the list in
 sources.yml: new entries are published, deleted ones are removed.
@@ -91,7 +91,7 @@ def _add_clean_args(p: argparse.ArgumentParser) -> None:
     g.add_argument("--skip-front-matter", dest="skip_front_matter", action="store_true", default=None,
                    help="cut everything before the abstract (default in --profile paper)")
     g.add_argument("--keep-front-matter", dest="skip_front_matter", action="store_false",
-                   help="narrate the title page, authors and affiliations")
+                   help="dictate the title page, authors and affiliations")
 
 
 def _add_voice_args(p: argparse.ArgumentParser) -> None:

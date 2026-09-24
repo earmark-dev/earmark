@@ -1,52 +1,28 @@
-`earmark` is a python CLI tool that extracts the text from an article URL or a
-document (PDF, DOCX, PPTX, EPUB, HTML, Markdown), rewrites it into something
-that sounds good read aloud, narrates it locally with
-[Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M), and puts the MP3 on a
-public podcast feed you can subscribe to on your phone.
+`earmark` turns articles and documents into dictated audio that you can stream to your phone. Give it a URL or a document (PDF, DOCX, PPTX, EPUB, HTML, Markdown), and earmark will extract the text,
+clean it for listening, dictate it with
+[Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M), and add the MP3 to a
+podcast feed that you subscribe to on your phone.
 
-Everything runs on your machine. No API keys, no per-minute cost.
+The audio is a word-for-word dictation of the text. earmark removes things that
+do not read well aloud, such as links, citations and reference lists. It does
+not summarize the text or rewrite it as a podcast show.
 
-## Install
+No API keys, no subscriptions, no per-minute cost.
 
-You need [uv](https://docs.astral.sh/uv/), `ffmpeg`, and Python 3.11 or 3.12
-(`uv` will fetch it for you). 
+## Two ways to use it
 
-Go to the [Installation](https://earmark-dev.github.io/earmark/user-guide/installation.html) page for details.
+**[Use it on GitHub](https://earmark-dev.github.io/earmark/github/setup.html)
+(recommended).** Make a repo from a template and turn on GitHub Pages. Then
+list what you want to hear in `sources.yml`. Each commit dictates the new
+entries and updates your feed. You install nothing and run nothing.
 
-## Main commands
+**[Use it locally](https://earmark-dev.github.io/earmark/local/install.html).**
+Install the command-line tool and run
+`earmark publish https://example.com/article`. Host the library on pCloud, a
+storage bucket or your own server.
 
-Everything earmark makes lands in one folder you choose (your [library](https://earmark-dev.github.io/earmark/user-guide/the-library.html)),
-which should be a folder served on the public web. 
-
-There are 3 main commands: 
-
-1. Get the text: `earmark text SOURCE`
-2. Narrate the text: `earmark audio SOURCE`
-3. Publish to your feed: `earmark publish SOURCE`
-
-In each step, the `SOURCE` can be an article URL or a document (PDF, DOCX, PPTX, EPUB, HTML, Markdown). 
-
-Also, each step will run the prior steps, so step 3 (`earmark publish SOURCE`) is all you need to run the whole chain from `SOURCE` to audio published in your feed.
-
-The intermediate steps are there in case you want to edit the raw text before narrating the audio.
-
-The other four commands are setup and housekeeping: `init`,
-`config`, `feed`, `voices`.
-
-## Start here
-
-| | |
-|---|---|
-| [Installation](https://earmark-dev.github.io/earmark/user-guide/installation.html) | uv, ffmpeg, and the Python version that matters |
-| [Quickstart](https://earmark-dev.github.io/earmark/user-guide/quickstart.html) | empty folder to something playing on your phone |
-| [The library](https://earmark-dev.github.io/earmark/user-guide/the-library.html) | why a library is a folder |
-| [The pipeline](https://earmark-dev.github.io/earmark/user-guide/the-pipeline.html) | `text`, `audio`, `publish`, and editing in between |
-| [Text cleaning](https://earmark-dev.github.io/earmark/user-guide/text-cleaning.html) | what gets rewritten before anything is spoken |
-| [Choosing a voice](https://earmark-dev.github.io/earmark/user-guide/voices.html) | 54 voices and how to pick one |
-| [Publishing anywhere](https://earmark-dev.github.io/earmark/user-guide/publishing.html) | GitHub Pages, rclone, rsync: one line each |
-| [Subscribing on your phone](https://earmark-dev.github.io/earmark/user-guide/subscribing.html) | where the feed URL goes in each app |
-| [Running on GitHub](https://earmark-dev.github.io/earmark/user-guide/github.html) | a repo that narrates and publishes itself, nothing installed |
-| [Reference](https://earmark-dev.github.io/earmark/reference/) | every command, flag and config key |
+The [Reference](https://earmark-dev.github.io/earmark/reference/) lists every
+command, flag and setting.
 
 ## Development
 

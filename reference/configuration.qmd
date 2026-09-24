@@ -42,8 +42,8 @@ after_publish = "git add -A && git commit -m 'earmark' && git push"
 ```
 
 It is a config key rather than a plugin system on purpose: it covers every host
-without earmark knowing the name of one. Recipes: [Publishing
-anywhere](../user-guide/publishing.qmd).
+without earmark knowing the name of one. Recipes: [Host a
+library](../local/hosting.qmd).
 
 ## `[feed]`
 
@@ -72,7 +72,7 @@ cover = "cover.jpg"
 with a message telling you to run `earmark config`.
 
 `cover` and `image` are not interchangeable: `image` disables the cover
-pipeline rather than racing it. See [Cover art](../user-guide/cover-art.qmd).
+pipeline rather than racing it.
 
 ## `[replace]`
 
