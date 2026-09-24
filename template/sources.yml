@@ -6,6 +6,7 @@
 #
 # An entry is a URL, a file you uploaded into files/, or a mapping with
 # `source:` plus any of: title, author, date, voice, speed, lang, profile.
+# To change the voice or the speed of every entry, edit earmark.toml instead.
 # Remove the "# " in front of a line to use it.
 #
 # - https://example.com/some-article

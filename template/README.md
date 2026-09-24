@@ -21,11 +21,32 @@ upload it into [`files/`](files) first, then list it as `- files/name.pdf`.
 
 To remove an episode, delete its line from `sources.yml`.
 
+## Changing the voice or the speed
+
+The first run adds [`earmark.toml`](earmark.toml) to this repo. It holds the
+settings for every new episode. Edit it and commit, the same way as
+`sources.yml`:
+
+```toml
+voice = "bf_emma"   # hear every voice: https://earmark-dev.github.io/earmark/settings/
+speed = 1.1         # 0.5 to 2.0
+lang = "en-gb"      # en-gb for a British voice, en-us for an American one
+```
+
+A change applies to episodes made after it, not to the ones you already have.
+To give one entry its own voice, write it as a mapping in `sources.yml`:
+
+```yaml
+- source: https://example.com/an-article
+  voice: am_michael
+```
+
+Every setting is on the [Settings
+page](https://earmark-dev.github.io/earmark/settings/).
+
 ## Worth knowing
 
 - **Everything in a public repo is public**, including files you upload to
   `files/`. Only upload what you have the right to redistribute.
 - GitHub Pages stops at about 1 GB. At the default bitrate one hour of audio is
   about 29 MB, so that is roughly 30 hours of audio.
-- Settings you can change, such as the voice and the speed, are in
-  `earmark.toml`, which appears after the first run.

@@ -3,6 +3,27 @@ title: Settings
 description: Every setting you can change, and where to change it.
 ---
 
+## Change the voice or the speed of every episode
+
+This is the change most people want. Open `earmark.toml` in your library and
+edit these lines. On GitHub, the file is in your repo after the first run, and
+the pencil icon opens it. Locally, `earmark config` opens it.
+
+```toml
+voice = "bf_emma"   # hear every voice below
+speed = 1.1         # 0.5 to 2.0
+lang = "en-gb"      # en-gb for a British voice, en-us for an American one
+```
+
+Commit the change, or save it locally. Every episode made after that uses the
+new voice and speed. Episodes you already have keep the voice they were made
+with.
+
+You do not need to repeat these settings in `sources.yml`. An entry uses them
+unless it sets its own.
+
+## Where settings go
+
 You can change a setting in three places. They are the same settings, whether
 you use earmark on GitHub or on your own computer.
 

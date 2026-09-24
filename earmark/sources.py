@@ -39,6 +39,8 @@ TEMPLATE = """\
 # An entry is a URL, a file path relative to this folder, or a mapping with
 # `source:` plus any of: title, author, date, voice, speed, lang, profile.
 #
+# To change the voice or the speed of every entry, edit earmark.toml instead.
+#
 # - https://example.com/some-article
 # - files/a-paper.pdf
 # - source: https://example.com/long-read

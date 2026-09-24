@@ -50,12 +50,16 @@ TEMPLATE = """\
 # This file marks the folder it lives in as an earmark library. Everything
 # earmark makes -- markdown in text/, MP3s, feed.xml -- lands beside it.
 #
-# Every setting here is a default; a command-line flag always wins.
+# Every setting here is a default for every new episode. A setting on one
+# entry in sources.yml, or a command-line flag, wins over it.
 
-# voice = "af_heart"      # see: earmark voices
-# speed = 1.0             # 0.5 to 2.0
+# The voice for every episode. Hear them all on the Settings page:
+# https://earmark-dev.github.io/earmark/settings/
+voice = "af_heart"
+speed = 1.0               # 0.5 to 2.0
+lang = "en-us"            # en-gb for a British voice (one that starts with b)
+
 # profile = "article"     # article | paper | book
-# lang = "en-us"
 # model = "full"          # full | fp16 | int8
 # engine = "kokoro"       # kokoro | say
 # bitrate = "64k"
