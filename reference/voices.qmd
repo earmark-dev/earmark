@@ -76,4 +76,4 @@ earmark voices --all
 earmark voices -q                     # names only, for scripting
 ```
 
-See also: [Choosing a voice](../user-guide/voices.qmd).
+See also: [Use the CLI](../local/use.qmd).

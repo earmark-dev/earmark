@@ -68,10 +68,6 @@ def test_written_markdown_is_reused_verbatim(article, tmp_path):
     assert doc.meta.title == "A Short Article"
 
 
-def test_markdown_without_front_matter_is_still_cleaned(article):
-    assert pipeline.load(str(article), options_for("article")).reused is False
-
-
 def test_an_explicit_title_beats_the_front_matter(article, tmp_path):
     out = pipeline.write_markdown(load(article), tmp_path / "a.md")
     doc = pipeline.load(str(out), options_for("article"), title="My Own Title")

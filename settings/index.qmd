@@ -1,0 +1,166 @@
+---
+title: Settings
+description: Every setting you can change, and where to change it.
+---
+
+You can change a setting in three places. They are the same settings, whether
+you use earmark on GitHub or on your own computer.
+
+| Where | Applies to | How |
+|---|---|---|
+| **`earmark.toml`** | every new episode | Edit the file in your library. On GitHub, use the web editor. Locally, run `earmark config`. |
+| **`sources.yml`** | one entry | Write the entry as a `source:` with the setting under it. |
+| **A command-line flag** | one command | Add the flag, such as `--voice bf_emma`. Local only. |
+
+When one setting is in more than one place, the more specific one wins:
+
+1. a flag, or a setting on a `sources.yml` entry
+2. `earmark.toml`
+3. the built-in default
+
+A setting changes new episodes only. To make an existing episode again with a
+new setting, see [Remove something](../github/add.qmd#remove-something) on
+GitHub, or use `earmark publish SOURCE --refresh` locally.
+
+## The voice
+
+| Setting | `earmark.toml` | `sources.yml` | Flag | Default |
+|---|---|---|---|---|
+| Voice | `voice = "bf_emma"` | `voice: bf_emma` | `--voice bf_emma` | `af_heart` |
+| Speed, `0.5` to `2.0` | `speed = 1.2` | `speed: 1.2` | `--speed 1.2` | `1.0` |
+| Pronunciation language | `lang = "en-gb"` | `lang: en-gb` | `--lang en-gb` | `en-us` |
+
+- **Voice.** The first letter of a voice name is its language: `a` is American
+  English, `b` is British English. The second letter is `f` for female or `m`
+  for male. To hear any voice read your own text, use the [Kokoro
+  demo](https://huggingface.co/spaces/hexgrad/Kokoro-TTS), or locally run
+  `earmark voices --try bf_emma`. `af_heart` and `af_bella` are the best
+  voices.
+- **Speed.** `1.0` is the voice's natural pace. Your podcast app can also play
+  faster. A setting here is useful when you want every episode faster without
+  changing the app.
+- **Pronunciation language.** Set it to match the voice, such as `en-gb` for a
+  `b` voice.
+
+### Hear the suggested voices
+
+Each voice says the same line. Kokoro grades every voice, from A down to F,
+and these are the ones graded C or better. For a British voice, also set
+`lang` to `en-gb`.
+
+| Voice | Accent | Gender | Grade | Listen |
+|---|---|---|---|---|
+| `af_heart` | American | female | A | <audio controls preload="none" src="../assets/voices/af_heart.mp3"></audio> |
+| `af_bella` | American | female | A- | <audio controls preload="none" src="../assets/voices/af_bella.mp3"></audio> |
+| `af_nicole` | American | female | B- | <audio controls preload="none" src="../assets/voices/af_nicole.mp3"></audio> |
+| `af_aoede` | American | female | C+ | <audio controls preload="none" src="../assets/voices/af_aoede.mp3"></audio> |
+| `af_kore` | American | female | C+ | <audio controls preload="none" src="../assets/voices/af_kore.mp3"></audio> |
+| `af_sarah` | American | female | C+ | <audio controls preload="none" src="../assets/voices/af_sarah.mp3"></audio> |
+| `af_alloy` | American | female | C | <audio controls preload="none" src="../assets/voices/af_alloy.mp3"></audio> |
+| `af_nova` | American | female | C | <audio controls preload="none" src="../assets/voices/af_nova.mp3"></audio> |
+| `am_fenrir` | American | male | C+ | <audio controls preload="none" src="../assets/voices/am_fenrir.mp3"></audio> |
+| `am_michael` | American | male | C+ | <audio controls preload="none" src="../assets/voices/am_michael.mp3"></audio> |
+| `am_puck` | American | male | C+ | <audio controls preload="none" src="../assets/voices/am_puck.mp3"></audio> |
+| `bf_emma` | British | female | B- | <audio controls preload="none" src="../assets/voices/bf_emma.mp3"></audio> |
+| `bf_isabella` | British | female | C | <audio controls preload="none" src="../assets/voices/bf_isabella.mp3"></audio> |
+| `bm_fable` | British | male | C | <audio controls preload="none" src="../assets/voices/bm_fable.mp3"></audio> |
+| `bm_george` | British | male | C | <audio controls preload="none" src="../assets/voices/bm_george.mp3"></audio> |
+
+## The text
+
+| Setting | `earmark.toml` | `sources.yml` | Flag | Default |
+|---|---|---|---|---|
+| Profile | `profile = "paper"` | `profile: paper` | `--profile paper` | `article` |
+| Words to say differently | a `[replace]` table | | | none |
+
+A **profile** is a set of cleaning rules for one kind of text:
+
+| Profile | For | What it changes |
+|---|---|---|
+| `article` | web articles and blog posts | nothing; these are the defaults |
+| `paper` | academic papers | removes author-year citations such as "(Smith, 2020)" and skips everything before the abstract |
+| `book` | books and long reports | describes tables instead of skipping them, and keeps the reference list |
+
+**Words to say differently.** When a word is dictated wrongly in every episode,
+fix it once in `earmark.toml`:
+
+```toml
+[replace]
+BEV = "battery electric vehicle"
+NIMBY = "nimby"
+```
+
+Locally, you can also fine-tune the cleaning of one document with flags such as
+`--keep-references`, `--keep-citations`, `--tables describe` and
+`--drop-sections "Appendix"`. See [`earmark text`](../reference/text.qmd) for
+all of them.
+
+## The episode
+
+| Setting | `sources.yml` | Flag | Default |
+|---|---|---|---|
+| Title | `title: A better title` | `--title "A better title"` | found in the source |
+| Author | `author: Jane Doe` | `--author "Jane Doe"` | found in the source |
+| Date | `date: 2026-01-31` | `--date 2026-01-31` | found in the source, else today |
+| Spoken title | | `--no-title-card` | on |
+
+Each episode starts by saying its title and author. `--no-title-card` turns
+that off.
+
+## The podcast
+
+These are in the `[feed]` table of `earmark.toml` and apply to the whole feed.
+
+| Setting | `earmark.toml` | Default |
+|---|---|---|
+| Podcast title | `title = "My Reading Pile"` | the repo name on GitHub, `earmark` locally |
+| Author | `author = "Jane Doe"` | none |
+| Description | `description = "Things I meant to read."` | none |
+| Cover image | `cover = "art.png"` | none |
+
+For `cover`, put a PNG or JPEG in the library, such as `art.png` next to
+`earmark.toml`, and name it in the setting. It does not have to be square or
+the right size. earmark makes a copy that podcast apps accept and leaves your
+file as it is. Apps can take hours to show a new cover.
+
+## The audio file
+
+| Setting | `earmark.toml` | Flag | Default |
+|---|---|---|---|
+| MP3 bitrate | `bitrate = "48k"` | `--bitrate 48k` | `64k` |
+| Sample rate | `sample_rate = 24000` | `--sample-rate 24000` | `44100` |
+
+The defaults suit speech. A lower bitrate makes smaller files, which helps on
+GitHub, where one file cannot be larger than 100 MB and the site stops at about
+1 GB.
+
+## Example
+
+An `earmark.toml` with a British voice, a little faster, and a podcast title:
+
+```toml
+voice = "bf_emma"
+lang = "en-gb"
+speed = 1.1
+
+[replace]
+BEV = "battery electric vehicle"
+
+[feed]
+base_url = "https://you.github.io/my-library"
+title = "My Reading Pile"
+cover = "art.png"
+```
+
+A `sources.yml` where one paper uses its own settings:
+
+```yaml
+- https://example.com/an-article
+- source: files/attention-is-all-you-need.pdf
+  profile: paper
+  voice: am_michael
+  lang: en-us
+```
+
+The [configuration reference](../reference/configuration.qmd) lists every key,
+including the rarely needed ones, with the errors that each wrong value gives.

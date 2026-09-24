@@ -1,0 +1,35 @@
+---
+title: Subscribe
+description: Find your feed URL and add it to a podcast app.
+---
+
+## Find your feed URL
+
+Your feed URL is
+
+```
+https://<you>.github.io/<repo>/feed.xml
+```
+
+where `<you>` is your GitHub user name in lowercase and `<repo>` is the name of
+your library repo. The summary of every earmark run in the **Actions** tab also
+shows it.
+
+## Add it to your podcast app
+
+Your feed is private. It is not in any podcast directory, so you cannot find it
+by searching. Give the app the feed URL:
+
+| App | Where the URL goes |
+|---|---|
+| **Overcast** | **+** → **Add URL** |
+| **Pocket Casts** | **Profile** → **Add RSS feed** |
+| **AntennaPod** | **+** → **Add podcast by RSS address** |
+| **Castbox** | Paste the URL into the search bar, then tap the result and **Subscribe** |
+| **Apple Podcasts** | **Library** → **Edit** → *Add a Show by URL*. This works, but not reliably |
+
+New episodes appear after the run finishes. Pull to refresh if your app has not
+checked yet.
+
+Podcast apps cache artwork and show titles for a long time. A new cover can
+take hours to appear, even when new episodes arrive at once.

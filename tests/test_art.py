@@ -41,9 +41,23 @@ def test_upscales_an_image_below_the_1400_minimum(tmp_path):
 
 
 def test_pads_rather_than_crops_a_non_square_image(tmp_path):
-    src = make_image(tmp_path / "wide.png", 2000, 1000)
-    out = art.prepare(src, tmp_path / "cover.jpg", size=1400)
+    src = make_image(tmp_path / "wide.png", 2000, 1000, rgba=False)
+    out = art.prepare(src, tmp_path / "cover.jpg", size=1400, background="white")
     assert art.dimensions(out) == (1400, 1400)
+    # Square dimensions alone would pass a crop too. Padding is what puts the
+    # background in the top rows and leaves the image in the middle.
+    top, middle = pixel(out, 700, 5), pixel(out, 700, 700)
+    assert min(top) > 240, f"top edge is {top}, not white padding"
+    assert middle[0] > 200 and middle[1] < 60, f"centre is {middle}, not the red image"
+
+
+def pixel(path, x, y):
+    raw = subprocess.run(
+        ["ffmpeg", "-hide_banner", "-loglevel", "error", "-i", str(path),
+         "-vf", f"crop=2:2:{x}:{y}", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
+        capture_output=True, check=True,
+    ).stdout
+    return tuple(raw[:3])
 
 
 def test_transparency_is_flattened_onto_the_background(tmp_path):

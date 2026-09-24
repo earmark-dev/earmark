@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+"""Make the voice samples on the docs' Settings page.
+
+One short MP3 per suggested voice, all saying the same line, written to
+assets/voices/<voice>.mp3. Each sample goes through `earmark audio` in a
+scratch library, so it sounds exactly like a real episode.
+
+Rerun it only when the model, the line or the list of suggested voices
+changes:
+
+    .venv/bin/python bin/voice-samples
+"""
+
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+from earmark.tts.catalog import GRADE_ORDER, GRADES  # noqa: E402
+
+LINE = "If you want to view paradise, simply look around and view it."
+OUT = ROOT / "assets" / "voices"
+# The suggested voices are the ones Kokoro grades C or better.
+CUTOFF = GRADE_ORDER.index("C")
+LANG = {"a": "en-us", "b": "en-gb"}
+
+
+def suggested() -> list[str]:
+    return [v for v, g in GRADES.items() if GRADE_ORDER.index(g) <= CUTOFF]
+
+
+def main() -> int:
+    OUT.mkdir(parents=True, exist_ok=True)
+    earmark = [sys.executable, str(ROOT / "bin" / "earmark")]
+    with tempfile.TemporaryDirectory() as tmp:
+        lib = Path(tmp)
+        subprocess.run([*earmark, "init", str(lib), "--no-default",
+                        "--base-url", "https://example.com"], check=True, capture_output=True)
+        line = lib / "line.md"
+        line.write_text(LINE + "\n", encoding="utf-8")
+        for voice in suggested():
+            subprocess.run([*earmark, "audio", str(line), "--library", str(lib),
+                            "--voice", voice, "--lang", LANG[voice[0]],
+                            "--no-title-card", "--refresh", "-q"],
+                           check=True, capture_output=True)
+            shutil.copyfile(lib / "audio" / "line.mp3", OUT / f"{voice}.mp3")
+            print(OUT.relative_to(ROOT) / f"{voice}.mp3")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

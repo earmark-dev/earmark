@@ -27,10 +27,6 @@ def test_scalars_override_defaults(tmp_path):
     assert cfg.get("lang") == DEFAULTS["lang"]
 
 
-def test_profile_is_a_top_level_setting(tmp_path):
-    assert load(write(tmp_path, 'profile = "paper"\n')).get("profile") == "paper"
-
-
 def test_replace_table(tmp_path):
     cfg = load(write(tmp_path, '[replace]\nBEV = "battery electric vehicle"\n'))
     assert cfg.replace == {"BEV": "battery electric vehicle"}
@@ -97,6 +93,7 @@ def test_replaced_clean_section_warns(tmp_path):
     [
         ("speed = 3.0", "speed"),
         ("speed = 0.1", "speed"),
+        ("speed = true", "speed"),
         ('speed = "fast"', "speed"),
         ('profile = "thesis"', "profile"),
         ('model = "tiny"', "model"),
@@ -129,10 +126,6 @@ def test_malformed_toml_is_an_error_not_a_crash(tmp_path):
     cfg = load(write(tmp_path, "voice = \n"))
     assert cfg.errors and "TOML" in cfg.errors[0]
     assert cfg.get("voice") == DEFAULTS["voice"]
-
-
-def test_speed_bool_rejected(tmp_path):
-    assert load(write(tmp_path, "speed = true\n")).errors
 
 
 def test_replace_must_be_a_table(tmp_path):

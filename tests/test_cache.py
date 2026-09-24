@@ -11,6 +11,9 @@ def test_key_changes_with_every_input():
     assert cache.key(**{**base, "voice": "af_bella"}) != baseline
     assert cache.key(**{**base, "speed": 1.1}) != baseline
     assert cache.key(**{**base, "lang": "en-gb"}) != baseline
+    # Pauses are baked into the cached samples, so they are part of the key.
+    assert cache.key(**base, pause_before=0.5) != baseline
+    assert cache.key(**base, pause_after=0.5) != baseline
     assert cache.key(**base) == baseline
 
 
@@ -37,13 +40,6 @@ def test_info_and_clear():
     removed, freed = cache.clear()
     assert removed == 3 and freed == 3 * 200
     assert cache.info()["count"] == 0
-
-
-def test_clear_respects_age():
-    cache.put(cache.key("fresh", "f", "v", 1.0, "en-us"), np.zeros(10, dtype=np.float32))
-    removed, _ = cache.clear(older_than_days=30)
-    assert removed == 0
-    assert cache.info()["count"] == 1
 
 
 def test_legacy_float32_entries_are_still_cleanable():

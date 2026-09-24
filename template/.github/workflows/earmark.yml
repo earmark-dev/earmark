@@ -1,0 +1,30 @@
+# Dictate everything in sources.yml and publish it on GitHub Pages.
+#
+# Runs when sources.yml, a file under files/, or earmark.toml changes, and on
+# demand from the Actions tab. The first run also writes earmark.toml.
+name: earmark
+
+on:
+  push:
+    branches: [main]
+    paths: [sources.yml, "files/**", earmark.toml, .github/workflows/earmark.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Two quick edits run one after the other rather than racing to push.
+concurrency:
+  group: earmark
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    # Never in the template itself: a run there would commit an earmark.toml
+    # with the template's own base_url into every repo made from it.
+    if: ${{ !github.event.repository.is_template }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v6
+      - uses: earmark-dev/earmark@v1

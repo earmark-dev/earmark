@@ -48,4 +48,4 @@ earmark init ~/pCloud\ Drive/public/earmark \
 earmark init ~/public/fiction --base-url https://example.com/fiction --no-default
 ```
 
-See also: [The library](../user-guide/the-library.qmd).
+See also: [Use the CLI](../local/use.qmd).

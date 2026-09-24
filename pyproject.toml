@@ -1,7 +1,7 @@
 [project]
 name = "earmark"
 version = "0.1.0"
-description = "Turn articles into narrated audio, then publish to a public podcast feed"
+description = "Turn articles into dictated audio, then publish to a public podcast feed"
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
 license = { text = "MIT" }
@@ -21,6 +21,7 @@ dependencies = [
   "trafilatura>=2.2.0",
   "markitdown[pdf,docx,pptx]>=0.1.7",
   "pypdf>=6.0",
+  "pyyaml>=6.0",
   "mutagen>=1.47",
   "platformdirs>=4.0",
   "rich>=13",
@@ -31,9 +32,9 @@ misaki = ["misaki[en]>=0.9.4"]
 dev = ["pytest>=8", "pytest-cov"]
 
 [project.urls]
-Homepage = "https://github.com/jhelvy/earmark"
-Documentation = "https://jhelvy.github.io/earmark"
-Issues = "https://github.com/jhelvy/earmark/issues"
+Homepage = "https://github.com/earmark-dev/earmark"
+Documentation = "https://earmark-dev.github.io/earmark"
+Issues = "https://github.com/earmark-dev/earmark/issues"
 
 [project.scripts]
 earmark = "earmark.cli:main"

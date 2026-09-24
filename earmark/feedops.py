@@ -23,6 +23,7 @@ CHANNEL_KEYS = ("title", "description", "author", "link", "language", "category"
 
 # Files in the library root that earmark owns. Anything else there is an orphan.
 RESERVED = {feed_mod.FEED_FILE, "episodes.json", "earmark.toml", art.COVER_NAME}
+AUDIO_SUFFIXES = {".mp3", ".m4a", ".wav"}
 
 
 @dataclass
@@ -55,7 +56,9 @@ class Feed:
 
     # -- writing -----------------------------------------------------------
 
-    def add(self, mp3: Path, meta, seconds: float, description: str = "") -> feed_mod.Episode:
+    def add(
+        self, mp3: Path, meta, seconds: float, description: str = "", listed: str | None = None,
+    ) -> feed_mod.Episode:
         mp3 = Path(mp3)
         digest = _content_id(mp3)
         filename = _episode_filename(meta.title, mp3)
@@ -71,10 +74,15 @@ class Feed:
             # filesystem layout to every subscriber and links nowhere.
             source=meta.source if _is_url(meta.source) else None,
             description=description or (meta.source if _is_url(meta.source) else ""),
+            listed=listed,
         )
         # Re-publishing the same document replaces its episode rather than
-        # accumulating duplicates.
-        self.state.episodes = [e for e in self.state.episodes if e.id != digest]
+        # accumulating duplicates. Same bytes means the same episode; so does
+        # the same filename, because a new render overwrote that file and the
+        # old entry would point at the new audio.
+        self.state.episodes = [
+            e for e in self.state.episodes if e.id != digest and e.filename != filename
+        ]
         self.state.episodes.append(episode)
         self.site.put(mp3, episode.name)
         return episode
@@ -227,9 +235,17 @@ class Feed:
         return sum(e.bytes for e in self.state.episodes)
 
     def orphans(self) -> list[str]:
-        """Published files in the library root the manifest no longer lists."""
+        """Audio in the library the manifest no longer lists.
+
+        Only audio. A library can be a git repo, whose root also holds a README,
+        a .gitignore, a .nojekyll and sources.yml, and `--prune --orphans` must
+        never delete any of those.
+        """
         known = {e.name for e in self.state.episodes} | RESERVED
-        return sorted(n for n in self.site.list_names() if n not in known)
+        return sorted(
+            n for n in self.site.list_names()
+            if n not in known and Path(n).suffix.lower() in AUDIO_SUFFIXES
+        )
 
     def drop_orphans(self) -> list[str]:
         orphans = self.orphans()

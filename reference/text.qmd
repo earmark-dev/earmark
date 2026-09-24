@@ -10,7 +10,7 @@ earmark text SOURCE [--stdout] [--raw] [--force]
 
 Extracts `SOURCE`, cleans it, and writes `text/<name>.md` in the library. The
 file carries `earmark: cleaned` in its front matter, which means `audio` and
-`publish` will narrate it **exactly as it stands**: your edits are never
+`publish` will dictate it **exactly as it stands**: your edits are never
 re-cleaned.
 
 ## Arguments
@@ -60,7 +60,7 @@ Shared with [`audio`](audio.qmd) and [`publish`](publish.qmd).
 | `--say-code` | off | say "Code block omitted" instead of skipping silently |
 | `--drop-sections LIST` | none | comma-separated extra headings to cut |
 | `--skip-front-matter` | on in `--profile paper` | cut everything before the abstract |
-| `--keep-front-matter` | | narrate the title page, authors and affiliations |
+| `--keep-front-matter` | | dictate the title page, authors and affiliations |
 
 A flag always beats the profile, and the profile always beats the config file.
 
@@ -91,4 +91,4 @@ text/some-paper.md  (4,210 words)
 The second line goes to **stderr**, so `earmark text x.pdf --stdout | pbcopy`
 stays clean.
 
-See also: [Text cleaning](../user-guide/text-cleaning.qmd).
+See also: [Use the CLI](../local/use.qmd).

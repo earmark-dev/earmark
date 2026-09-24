@@ -64,7 +64,9 @@ def test_guid_is_not_a_permalink(state):
 
 
 def test_state_round_trips(state):
-    assert FeedState.from_json(state.to_json()).episodes[0].title == "First"
+    # Every field, not one: a field missing from to_json or from_json would
+    # silently drop out of episodes.json on the next publish.
+    assert FeedState.from_json(state.to_json()) == state
 
 
 @pytest.mark.parametrize(
@@ -363,3 +365,36 @@ def test_cover_url_is_cache_busted_by_content(published, solid_image):
     assert "?v=" in first
     assert first == again          # same bytes, same URL: no pointless refetch
     assert changed != first
+
+
+def test_republishing_a_changed_document_replaces_its_episode(published, library):
+    """Both renders land at audio/<slug>.mp3, so the old episode's file is
+    already gone. Keeping its entry would list one MP3 twice in the feed."""
+    from earmark.extract.meta import Metadata
+
+    mp3 = _fake_mp3(library.audio_dir, "a-paper.mp3", size=100)
+    published.add(mp3, Metadata(title="A Paper"), 10.0)
+    mp3.write_bytes(b"\xff\xfb" + b"1" * 200)
+    published.add(mp3, Metadata(title="A Paper"), 12.0)
+    assert [e.filename for e in published.state.episodes].count("a-paper.mp3") == 1
+
+
+def test_a_git_repo_library_has_no_orphans_but_audio(published, tmp_path):
+    """A library that is a GitHub repo keeps a README, a .nojekyll and a
+    sources.yml in its root; `--prune --orphans` must never delete them."""
+    for name in ("README.md", ".nojekyll", ".gitignore", "sources.yml"):
+        (published.library.root / name).write_text("x", encoding="utf-8")
+    published.site.put(_fake_mp3(tmp_path, "stray.mp3"), "audio/stray.mp3")
+    assert published.orphans() == ["audio/stray.mp3"]
+
+
+def test_the_listed_entry_is_kept_but_never_published(published, tmp_path):
+    """`listed` is how sync finds an episode's entry; it is library
+    bookkeeping, and a local path in it must not reach subscribers."""
+    from earmark.extract.meta import Metadata
+
+    mp3 = _fake_mp3(tmp_path, "x.mp3")
+    published.add(mp3, Metadata(title="X"), 5.0, listed="files/private-notes.pdf")
+    reloaded = FeedState.from_json(published.state.to_json())
+    assert [e.listed for e in reloaded.episodes if e.title == "X"] == ["files/private-notes.pdf"]
+    assert "private-notes" not in feed_mod.build(published.state, published.site.url_for).decode()

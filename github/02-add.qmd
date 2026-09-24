@@ -1,0 +1,59 @@
+---
+title: Add and remove
+description: Edit sources.yml to add and remove episodes, and earmark.toml to change the settings.
+---
+
+Everything you do after setup is an edit to one file, `sources.yml`. Each
+entry in it is one episode. Each commit to it starts a run that dictates the
+new entries and removes the deleted ones.
+
+## Add something
+
+Edit `sources.yml` in the GitHub web editor (the pencil icon works on a phone
+too), add a line, and commit:
+
+```yaml
+- https://example.com/an-article-i-meant-to-read
+- files/attention-is-all-you-need.pdf
+- source: https://example.com/a-long-read
+  title: A better title
+  voice: bf_emma
+```
+
+- A **URL** is fetched and dictated.
+- A **document** (PDF, DOCX, PPTX, EPUB, HTML, Markdown) must be in the repo.
+  Upload it into `files/` with **Add file → Upload files**. Then list it by its
+  path, such as `files/paper.pdf`.
+- An entry can also be a `source:` with its own `title`, `author`, `date`,
+  `voice`, `speed` or `profile`. See the [`sources.yml`
+  reference](../reference/configuration.qmd#sources.yml).
+
+The run takes a few minutes. Then pull to refresh in your podcast app.
+
+## Remove something
+
+Delete the entry's line and commit. The next run removes the episode, its MP3
+and its text.
+
+An entry is matched by its exact text. Editing an entry's `voice` therefore does
+not dictate it again. To dictate an entry again, delete it, commit, then add it
+back.
+
+## Change the settings
+
+The first run writes `earmark.toml` into the repo. Edit it in the web editor to
+change the defaults for new episodes: the voice, the speed, the feed title, or
+the cover image. [Settings](../settings/index.qmd) lists every setting you can
+change, in `earmark.toml` or on one entry in `sources.yml`.
+
+## Limits
+
+- **Everything in a public repo is public.** This includes every file in
+  `files/`. Only upload what you have the right to share. GitHub Pages on a
+  private repo needs a paid plan.
+- **One file cannot be larger than 100 MB.** At the default bitrate, that is
+  about 3.4 hours of audio. Split a longer book, or lower `bitrate` in
+  `earmark.toml`.
+- **A Pages site stops at about 1 GB**, which is about 30 hours of audio. The
+  run summary warns you after 800 MB. Delete old entries from `sources.yml` to
+  stay below the limit.

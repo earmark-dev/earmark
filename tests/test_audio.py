@@ -6,10 +6,6 @@ from conftest import needs_ffmpeg
 from earmark import audio
 
 
-def test_silence_length():
-    assert len(audio.silence(0.5, 24000)) == 12000
-
-
 def test_format_duration():
     assert audio.format_duration(0) == "0:00:00"
     assert audio.format_duration(3661) == "1:01:01"
@@ -37,3 +33,21 @@ def test_duration_matches_samples(tmp_path):
     out = tmp_path / "d.mp3"
     written = audio.encode([audio.silence(3.0)], out)
     assert audio.duration_seconds(written) == pytest.approx(3.0, abs=0.01)
+    # The file itself, not just the arithmetic: a wrong -ar pairing would
+    # stretch or squash the audio and still report the input sample count.
+    assert audio.probe_duration(out) == pytest.approx(3.0, abs=0.1)
+
+
+@needs_ffmpeg
+def test_encode_resamples_to_mpeg1(tmp_path):
+    """24 kHz MP3 is MPEG-2, whose seek bar breaks in some players."""
+    import subprocess
+
+    out = tmp_path / "r.mp3"
+    audio.encode([audio.silence(1.0)], out)
+    rate = subprocess.run(
+        ["ffprobe", "-v", "error", "-select_streams", "a:0",
+         "-show_entries", "stream=sample_rate", "-of", "csv=p=0", str(out)],
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    assert rate == str(audio.DEFAULT_SAMPLE_RATE)

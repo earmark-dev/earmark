@@ -1,0 +1,133 @@
+# A library that publishes itself.
+#
+# Run from a repo that is an earmark library served by GitHub Pages: the Action
+# makes the feed match sources.yml, then commits what changed. Pages serves the
+# commit, so the commit *is* the publish -- the same idea as a library in any
+# other public folder.
+#
+#   - uses: actions/checkout@v6
+#   - uses: earmark-dev/earmark@v1
+#
+# Installs earmark from this Action's own checkout, so the version used is the
+# tag the workflow names. A push made with GITHUB_TOKEN never triggers another
+# workflow run, so committing back cannot loop.
+name: earmark
+description: Dictate everything in sources.yml and publish it as a podcast feed on GitHub Pages.
+author: John Paul Helveston
+branding:
+  icon: headphones
+  color: orange
+
+inputs:
+  base-url:
+    description: >-
+      The public URL the repo is served at. Only used the first time, to write
+      earmark.toml. Default: https://<owner>.github.io/<repo>
+    required: false
+    default: ""
+  title:
+    description: "Podcast title, used only the first time. Default: the repo name."
+    required: false
+    default: ""
+
+outputs:
+  feed-url:
+    description: The feed URL to paste into a podcast app.
+    value: ${{ steps.feed.outputs.url }}
+
+runs:
+  using: composite
+  steps:
+    - uses: astral-sh/setup-uv@v10.2.0
+
+    - name: Install earmark and ffmpeg
+      shell: bash
+      run: |
+        uv tool install --python 3.12 "${{ github.action_path }}"
+        command -v ffmpeg >/dev/null || { sudo apt-get update -q && sudo apt-get install -y -q ffmpeg; }
+
+    # 354 MB. Keyed on earmark.toml because that is where `model` is chosen;
+    # restore-keys means an unrelated config edit still starts from a hit.
+    - name: Restore the Kokoro model
+      uses: actions/cache@v6
+      with:
+        path: ~/.local/share/earmark/models
+        key: earmark-models-${{ hashFiles('earmark.toml') }}
+        restore-keys: earmark-models-
+
+    - name: Create the library on the first run
+      shell: bash
+      env:
+        BASE_URL: ${{ inputs.base-url }}
+        TITLE: ${{ inputs.title }}
+      run: |
+        [ -f earmark.toml ] && exit 0
+        owner=$(echo "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')
+        repo="${GITHUB_REPOSITORY#*/}"
+        if [ -z "$BASE_URL" ]; then
+          # A repo named <owner>.github.io is served at the root of the domain.
+          if [ "$(echo "$repo" | tr '[:upper:]' '[:lower:]')" = "$owner.github.io" ]; then
+            BASE_URL="https://$owner.github.io"
+          else
+            BASE_URL="https://$owner.github.io/$repo"
+          fi
+        fi
+        earmark init . --no-default --base-url "$BASE_URL" --title "${TITLE:-$repo}"
+        # Jekyll would otherwise skip files and folders it considers private.
+        touch .nojekyll
+
+    - name: Make the feed match sources.yml
+      id: sync
+      shell: bash
+      run: |
+        set +e
+        earmark publish -q 2>&1 | tee "$RUNNER_TEMP/earmark.log"
+        echo "status=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+
+    # GitHub rejects any file over 100 MB, and one rejected file fails the
+    # whole push. Stop here with a reason rather than there with a git error.
+    - name: Check file sizes
+      shell: bash
+      run: |
+        big=$(find audio -type f -size +95M 2>/dev/null)
+        if [ -n "$big" ]; then
+          echo "::error::over GitHub's 100 MB file limit: $big. Lower bitrate in earmark.toml or split the document."
+          exit 1
+        fi
+
+    - name: Commit and push
+      shell: bash
+      run: |
+        git add -A
+        if git diff --cached --quiet; then
+          echo "nothing changed"
+          exit 0
+        fi
+        git -c user.name="github-actions[bot]" \
+            -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "earmark: sync sources.yml"
+        # Someone may have edited sources.yml while this ran.
+        git pull -q --rebase
+        git push -q
+
+    - name: Summary
+      id: feed
+      shell: bash
+      run: |
+        url=$(earmark feed | sed -n 's/^feed *//p')
+        echo "url=$url" >> "$GITHUB_OUTPUT"
+        size=$(du -sm --exclude=.git . | cut -f1)
+        {
+          echo "### earmark"
+          echo
+          echo "Feed: $url"
+          echo
+          echo '```'
+          cat "$RUNNER_TEMP/earmark.log"
+          echo '```'
+          if [ "$size" -gt 800 ]; then
+            echo
+            echo "**The library is ${size} MB.** GitHub Pages stops at about 1 GB; delete some entries from sources.yml."
+          fi
+        } >> "$GITHUB_STEP_SUMMARY"
+        exit "${{ steps.sync.outputs.status }}"

@@ -1,0 +1,60 @@
+---
+title: Host a library
+description: Serve a CLI library from pCloud, a bucket, or your own server.
+---
+
+A podcast app downloads each episode from `<base_url>/audio/<name>.mp3`. A
+library can live on any service that makes a folder's files available at URLs
+like that, with no login.
+
+## Services that work
+
+| Service | `base_url` looks like |
+|---|---|
+| pCloud public folder | `https://filedn.com/XXXX/earmark` |
+| Cloudflare R2, public bucket | `https://pub-xxxx.r2.dev` |
+| Backblaze B2, public bucket | `https://f000.backblazeb2.com/file/my-bucket` |
+| AWS S3 or another S3-compatible bucket | `https://my-bucket.s3.amazonaws.com/audio` |
+| Your own web server | `https://example.com/audio` |
+| GitHub Pages, Netlify, Cloudflare Pages | `https://you.github.io/audio` |
+
+**Dropbox, Box, Google Drive, OneDrive and iCloud Drive do not work.** They
+give a separate share link for each file. They do not serve a folder at one
+URL.
+
+## A synced folder: nothing more to do
+
+If the library is in a folder that the service syncs to the web, such as a
+pCloud public folder, then `earmark publish` is complete when the MP3 is
+written. Set `base_url` to the public URL of that folder.
+
+## Anything else: upload with `after_publish`
+
+If the library is not in a public folder, set `after_publish` in
+`earmark.toml`. It is one shell command that earmark runs in the library after
+each publish:
+
+```toml
+after_publish = "rclone sync . r2:my-bucket/audio"
+
+[feed]
+base_url = "https://pub-xxxx.r2.dev"
+```
+
+| Host | `after_publish` |
+|---|---|
+| S3, R2, B2 (with [rclone](https://rclone.org)) | `rclone sync . r2:my-bucket/audio` |
+| Your own server | `rsync -a --delete . me@host:/var/www/audio/` |
+| A GitHub Pages repo | `git add -A && git commit -m earmark && git push` |
+
+Set `base_url` to the URL where the files arrive, not to the local folder.
+
+## Check the URLs
+
+An incorrect `base_url` causes no error. The feed looks correct, but the app
+shows no episodes. To test that the feed, the cover and the newest episodes
+download:
+
+```bash
+earmark feed --check
+```

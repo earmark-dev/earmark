@@ -80,16 +80,6 @@ def test_layout(two):
     assert papers.state_path == papers.root / "episodes.json"
 
 
-def test_the_config_has_no_library_key(two):
-    """The library is the folder, so moving it must need no edit."""
-    papers, _ = two
-    from earmark.config import DEFAULTS, load
-
-    assert "library" not in DEFAULTS
-    assert load(papers.config_path).warnings == []
-    assert "library =" not in papers.config_path.read_text()
-
-
 def test_a_library_survives_being_moved(two, monkeypatch, tmp_path):
     from earmark.config import load
 

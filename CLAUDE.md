@@ -25,8 +25,8 @@ is the least guessable thing about the design.
 
 ## The library is the unit
 
-A **library** is a folder holding `earmark.toml`, `text/*.md`, `audio/*.mp3`,
-`feed.xml`, `episodes.json` and `cover.jpg`. It is meant to be a folder served
+A **library** is a folder holding `earmark.toml`, `sources.yml`, `text/*.md`,
+`audio/*.mp3`, `feed.xml`, `episodes.json` and `cover.jpg`. It is meant to be a folder served
 on the public web, so writing the MP3 *is* publishing it.
 
 **There is no `library` config key and there must never be one.** The library
@@ -114,7 +114,7 @@ There used to be four publishers (folder, rclone, command, github). They are
 gone. A GitHub Pages repo, an rclone remote and an rsync target are all one line
 of `after_publish`, which is a config key rather than a plugin system and covers
 every host without earmark knowing the name of one. **Do not add a publisher
-back.** Add a recipe to the README's table.
+back.** Add a recipe to the table in `local/03-hosting.qmd`.
 
 ### Two ways off the feed, and they are not the same question
 
@@ -127,7 +127,8 @@ re-synthesis free; `--remove` means "I do not want this document", and leaving
 its text behind makes the user delete the same thing twice. `Feed.leftovers()`
 is where that list of extra files lives — everything downstream of a document
 is named from the same slug, which is the only link back, since an episode has
-no record of the source that produced it. `earmark feed` numbers its listing and
+no record of the source that produced it (except `listed`, and only for an
+episode sync published). `earmark feed` numbers its listing and
 `Feed.listing()` is the single definition of that order, so `--remove 3` and
 line 3 cannot drift apart. A number is a **position, not an identity** —
 publishing renumbers everything — which is why `--remove` always prints the
@@ -136,6 +137,44 @@ the default.
 
 `feed.py` renders XML from `episodes.json` and never parses XML back.
 `feedops.py` combines the two. Keep those three separate.
+
+### `sources.yml` and sync
+
+`earmark publish` with no SOURCE makes the feed match `sources.yml`
+(`earmark/sources.py`): unlisted entries are published, and episodes whose
+entry was deleted are removed the way `--remove` removes them. This is a mode
+of `publish`, not an eighth command. It exists so a library can be a GitHub
+repo that publishes itself (see below).
+
+- An entry is identified by its `source` string exactly as written, stored on
+  the episode as `Episode.listed`. **`listed` is never rendered into
+  `feed.xml`**: it can be a local path. Episodes with no `listed` were published
+  by hand and **sync never removes them**.
+- A list with any error stops the sync **before anything is removed**. Reading
+  half a list and syncing to it would delete the other half. For the same
+  reason a missing `sources.yml` is an error, not an empty list, while a file
+  of only comments (the template) is an empty list.
+- One entry failing at render time is reported and skipped; the rest publish
+  and the exit status is 1. In an Action, a dead link must not cost the others.
+- `feed --prune` and sync fight: a pruned episode that is still listed is
+  re-narrated on the next sync. In a synced library, the list is the size cap.
+
+`Feed.add` replaces any episode with the same digest **or the same filename**.
+Filenames follow the slug, so a re-render of an edited document overwrites the
+MP3 in place, and keeping the old entry listed one file twice.
+
+`Feed.orphans()` only ever reports audio. A library can be a git repo whose
+root holds a README, `.nojekyll`, `.gitignore` and `sources.yml`, and
+`--prune --orphans` must never delete those.
+
+### The GitHub Action
+
+`action.yml` at the repo root is a composite Action (`uses: earmark-dev/earmark@v1`)
+that installs earmark from its own checkout (`github.action_path`), so the tag
+a workflow names is the earmark version it runs. It caches the model, runs
+`earmark init` on the first run with a `base_url` derived from the repo name,
+runs `earmark publish`, refuses files over GitHub's 100 MB limit, and commits
+back. `template/` is the content of the `earmark-dev/library-template` template repo.
 
 ### Episode filenames follow the slug
 
@@ -190,7 +229,7 @@ untouched for 90 days, then LRU eviction above 2 GB.
 ## The docs are a site, not the README
 
 `README.md` is a landing page and nothing else. Everything a user reads lives
-at <https://jhelvy.github.io/earmark>, built with **great-docs**, which is a
+at <https://earmark-dev.github.io/earmark>, built with **great-docs**, which is a
 Python package that *generates* a Quarto project into the gitignored
 `great-docs/` directory on every build. There is no `_quarto.yml` to edit and
 committing one would be pointless — it is synthesized each time.
@@ -235,26 +274,39 @@ rebuild moves them.
   asking great-docs for a declared `includes:` list.
 
   The shared body links to the *deployed* site
-  (`https://jhelvy.github.io/earmark/user-guide/quickstart.html`) instead of
-  `user-guide/quickstart.qmd`: the same table has to work from GitHub's README
+  (`https://earmark-dev.github.io/earmark/github/setup.html`) instead of
+  `github/01-setup.qmd`: the same table has to work from GitHub's README
   view, where a relative `.qmd` path is a 404. The cost is that local preview
   navigation off the landing page goes to the live site.
 
-  Install instructions are **not** duplicated there. The partial names the three
-  prerequisites and links to `user_guide/01-installation.qmd`, which is the only
-  place the per-OS commands live.
+  Install instructions are **not** duplicated there. The partial links to
+  `local/01-install.qmd`, which is the only place the per-OS commands
+  live.
 - `great-docs.yml` (repo root) is the only committed config. `great-docs config`
   prints the full annotated template of everything it accepts.
-- `user_guide/NN-name.qmd` is the narrative, **read in order**; the `NN-`
-  prefix is the ordering mechanism and is stripped from the title and the URL.
+- **There is no `user_guide/`.** The guide is two navbar sections, one per way
+  to run earmark, declared under `sections:` in `great-docs.yml`:
+  `github/NN-name.qmd` ("Use it on GitHub": setup, add and remove, subscribe;
+  the recommended route) and `local/NN-name.qmd` ("Use it locally": install,
+  use, hosting). A third section, `settings/index.qmd`, is one page of every
+  setting a user tunes, shown three ways: `earmark.toml`, a `sources.yml` entry
+  and a flag. Keep it that short. Detail belongs in `reference/`, and design
+  rationale belongs here, not in the guide. The `NN-` prefix orders the sidebar
+  and is stripped from the title and the URL, so link to `02-add.qmd` from the
+  same section and to `../github/add.qmd` from another.
+- Guide screenshots live in `assets/screenshots/` (a resource directory, so
+  they are served) and are shown with `../assets/screenshots/<name>.png`.
+  Voice samples live in `assets/voices/`, made by `bin/voice-samples`. `test_guide_media_exist` fails on a missing screenshot or sample.
+- **earmark *dictates*; it does not *narrate*.** The audio is a word-for-word
+  reading of the cleaned text, not a summary or a podcast-style show. Use
+  "dictate" in every user-facing string: docs, help text, templates.
 - `reference/*.qmd` is the lookup material: one page per command, plus
   `configuration.qmd`.
-- Both live at the repo root because that is where great-docs looks. A section
-  under `docs/` builds, but its output keeps the whole source path while the
-  guide is canonicalized to `user-guide/`, so cross-links stop being symmetric.
-- Guide pages link each other by their prefixed filename (`04-the-pipeline.qmd`)
-  — great-docs strips the prefix. Cross-section links use the *output* names:
-  `../reference/text.qmd` and `../user-guide/voices.qmd`.
+- All three live at the repo root. A section under `docs/` builds, but its
+  output keeps the whole source path, so cross-links stop being symmetric.
+- Pages in one section link each other by their prefixed filename
+  (`02-use.qmd`) — great-docs strips the prefix. Cross-section links use the
+  *output* names: `../reference/text.qmd` and `../local/use.qmd`.
 
 **The generated Python API reference is off** (`reference: false`), and so is
 runtime introspection (`dynamic: false`). earmark is a CLI; nobody writes

@@ -13,10 +13,11 @@ from pathlib import Path
 
 import pytest
 
-from earmark import cli, config
+from earmark import cli, config, sources
 
 REFERENCE = Path(__file__).resolve().parent.parent / "reference"
-GUIDE = Path(__file__).resolve().parent.parent / "user_guide"
+# The guide sections, each ordered by an NN- prefix on its page names.
+GUIDES = [Path(__file__).resolve().parent.parent / d for d in ("github", "local")]
 
 
 def read(name: str) -> str:
@@ -84,8 +85,32 @@ def test_every_flag_is_documented():
     assert not missing, "undocumented flags: " + ", ".join(missing)
 
 
-def test_guide_pages_are_numbered_uniquely():
-    prefixes = [p.name[:2] for p in GUIDE.glob("*.qmd")]
+@pytest.mark.parametrize("guide", GUIDES, ids=lambda d: d.name)
+def test_guide_pages_are_numbered_uniquely(guide):
+    prefixes = [p.name[:2] for p in guide.glob("*.qmd")]
+    assert prefixes, f"no guide pages in {guide.name}/"
     assert len(prefixes) == len(set(prefixes)), "two guide pages share an order prefix"
-    for path in GUIDE.glob("*.qmd"):
+    for path in guide.glob("*.qmd"):
         assert re.match(r"^\d\d-", path.name), f"{path.name} has no NN- order prefix"
+
+
+@pytest.mark.parametrize("key", sources.OVERRIDES)
+def test_every_sources_override_is_on_the_settings_page(key):
+    # The settings page is where a user looks for what a sources.yml entry
+    # accepts; a new override that is missing there is invisible.
+    page = (REFERENCE.parent / "settings" / "index.qmd").read_text(encoding="utf-8")
+    assert f"`{key}: " in page, f"sources.yml key {key!r} is not on settings/index.qmd"
+
+
+def test_guide_media_exist():
+    # Screenshots and voice samples are committed files; a renamed or missing
+    # one renders as a broken image or a silent player, with no build error.
+    root = Path(__file__).resolve().parent.parent
+    for guide in [*GUIDES, root / "settings"]:
+        for page in guide.glob("*.qmd"):
+            text = page.read_text(encoding="utf-8")
+            srcs = re.findall(r"!\[[^\]]*\]\(([^)\s]+)", text) + re.findall(r'src="([^"]+)"', text)
+            for src in srcs:
+                if "://" not in src:
+                    path = (guide / src).resolve()
+                    assert path.is_file(), f"{page.relative_to(root)} uses missing file {src}"
