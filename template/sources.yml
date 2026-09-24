@@ -1,0 +1,16 @@
+# Your reading list. Every entry becomes one episode of your feed.
+#
+# Edit this file (the pencil icon on GitHub works) and commit. The earmark
+# Action narrates anything new and publishes it; the Actions tab shows progress
+# and, when it is done, your feed URL. Delete an entry to delete its episode.
+#
+# An entry is a URL, a file you uploaded into files/, or a mapping with
+# `source:` plus any of: title, author, date, voice, speed, lang, profile.
+# Remove the "# " in front of a line to use it.
+#
+# - https://example.com/some-article
+# - files/a-paper.pdf
+# - source: https://example.com/long-read
+#   title: A better title
+#   voice: bf_emma
+#   profile: paper

@@ -1,0 +1,27 @@
+# Narrate everything in sources.yml and publish it on GitHub Pages.
+#
+# Runs when sources.yml, a file under files/, or earmark.toml changes, and on
+# demand from the Actions tab. The first run also writes earmark.toml.
+name: earmark
+
+on:
+  push:
+    branches: [main]
+    paths: [sources.yml, "files/**", earmark.toml, .github/workflows/earmark.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Two quick edits run one after the other rather than racing to push.
+concurrency:
+  group: earmark
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v6
+      - uses: jhelvy/earmark@v1
